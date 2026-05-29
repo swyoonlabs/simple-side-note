@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "English Study Sidebar Note",
+  "version": "1.0",
+  "description": "AI와 대화하며 실시간으로 기록하는 사이드바 메모장",
+  "permissions": ["sidePanel", "storage", "contextMenus"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "action": {
+    "default_title": "메모장 열기"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [{
+    "matches": ["<all_urls>"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }],
+  "host_permissions": [
+    "http://127.0.0.1:27123/*"
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
