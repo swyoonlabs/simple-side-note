@@ -3,24 +3,24 @@ const status = document.getElementById('status');
 const dropZone = document.getElementById('dropZone');
 const clearBtn = document.getElementById('clearBtn');
 
-// 1. 저장된 메모 불러오기 (초기화)
+// 1. Load saved memo (initialize)
 chrome.storage.local.get(['studyMemo'], (result) => {
   if (result.studyMemo) {
     memoArea.value = result.studyMemo;
-    status.textContent = "상태: 이전 메모를 불러왔습니다.";
+    status.textContent = "Status: Previous memo loaded.";
   }
 });
 
-// 2. 입력할 때마다 실시간 자동 저장
+// 2. Real-time auto-save on input
 memoArea.addEventListener('input', () => {
   const content = memoArea.value;
   chrome.storage.local.set({ studyMemo: content }, () => {
-    status.textContent = "상태: 저장 중...";
-    setTimeout(() => { status.textContent = "상태: 모든 변경사항이 자동 저장됨"; }, 1000);
+    status.textContent = "Status: Saving...";
+    setTimeout(() => { status.textContent = "Status: All changes auto-saved"; }, 1000);
   });
 });
 
-// 3. 드래그 앤 드롭 - 텍스트 가져오기
+// 3. Drag and drop - get text
 dropZone.addEventListener('dragover', (e) => {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'copy';
@@ -42,13 +42,13 @@ dropZone.addEventListener('drop', (e) => {
     memoArea.value += entry;
     
     chrome.storage.local.set({ studyMemo: memoArea.value }, () => {
-      status.textContent = "상태: 드롭된 텍스트가 저장되었습니다.";
-      setTimeout(() => { status.textContent = "상태: 모든 변경사항이 자동 저장됨"; }, 2000);
+      status.textContent = "Status: Dropped text saved.";
+      setTimeout(() => { status.textContent = "Status: All changes auto-saved"; }, 2000);
     });
   }
 });
 
-// 4. 컨텍스트 메뉴에서 추가된 텍스트 감지
+// 4. Detect text added from context menu
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes.memoEntries) {
     const entries = changes.memoEntries.newValue || [];
@@ -62,8 +62,8 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       });
       
       chrome.storage.local.set({ studyMemo: memoArea.value }, () => {
-        status.textContent = "상태: " + newItems.length + "개 항목이 추가되었습니다.";
-        setTimeout(() => { status.textContent = "상태: 모든 변경사항이 자동 저장됨"; }, 3000);
+        status.textContent = "Status: " + newItems.length + " item(s) added.";
+        setTimeout(() => { status.textContent = "Status: All changes auto-saved"; }, 3000);
       });
       
       chrome.storage.local.remove('memoEntries');
@@ -71,12 +71,12 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
 });
 
-// 5. 메모 전체 지우기
+// 5. Clear all memos
 clearBtn.addEventListener('click', () => {
-  if (memoArea.value && confirm('모든 메모를 지우시겠습니까?')) {
+  if (memoArea.value && confirm('Are you sure you want to clear all memos?')) {
     memoArea.value = '';
     chrome.storage.local.set({ studyMemo: '' });
     chrome.storage.local.remove('memoEntries');
-    status.textContent = "상태: 메모가 모두 지워졌습니다.";
+    status.textContent = "Status: All memos cleared.";
   }
 });
