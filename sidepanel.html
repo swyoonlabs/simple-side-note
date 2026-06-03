@@ -3,35 +3,19 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body { width: 100%; padding: 15px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    h3 { color: #202124; margin-top: 0; }
+    body { width: 100%; padding: 15px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg, #ffffff); color: var(--text, #202124); }
+    h3 { color: var(--text, #202124); margin-top: 0; }
     textarea { 
       width: 100%; 
-      height: 80vh; 
+      height: 75vh; 
       padding: 10px; 
-      border: 1px solid #dadce0; 
+      border: 1px solid var(--border, #dadce0); 
       border-radius: 8px; 
       resize: none;
       font-size: 14px;
       box-sizing: border-box;
-    }
-    #status { font-size: 12px; color: #70757a; margin-bottom: 5px; }
-    #dropZone {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 8px;
-      border: 2px dashed #dadce0;
-      border-radius: 8px;
-      text-align: center;
-      color: #70757a;
-      font-size: 12px;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-    }
-    #dropZone.drag-over {
-      border-color: #1a73e8;
-      background-color: #e8f0fe;
-      color: #1a73e8;
+      background-color: var(--surface, #f8f9fa);
+      color: var(--text, #202124);
     }
     .btn-row {
       display: flex;
@@ -48,20 +32,305 @@
       box-sizing: border-box;
     }
     #clearBtn {
-      background-color: #dadce0;
-      color: #202124;
+      background-color: var(--btn-bg, #dadce0);
+      color: var(--text, #202124);
     }
-    #clearBtn:hover { background-color: #bdc1c6; }
+    #clearBtn:hover { background-color: var(--btn-hover, #bdc1c6); }
+
+    /* Tab styles */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .tab-item {
+      flex: 1;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary, #70757a);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .tab-item:hover {
+      color: var(--text, #202124);
+      background-color: var(--surface, #f1f3f4);
+    }
+    .tab-item.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Saved list styles */
+    .saved-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .saved-item {
+      padding: 10px;
+      margin-bottom: 6px;
+      background: var(--surface, #f8f9fa);
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+    .saved-item:hover {
+      background: var(--accent-bg, #e8f0fe);
+      border-color: var(--accent, #1a73e8);
+    }
+    .saved-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text, #202124);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .saved-item-date {
+      font-size: 11px;
+      color: var(--text-secondary, #70757a);
+      margin-top: 3px;
+    }
+    .saved-item-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .saved-item:hover .saved-item-actions {
+      opacity: 1;
+    }
+    .saved-item-actions button {
+      background: none;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 2px 4px;
+      transition: color 0.15s ease;
+    }
+    .saved-item-download:hover {
+      color: #1a73e8;
+    }
+    .saved-item-delete:hover {
+      color: #d93025;
+    }
+    #saveBtn {
+      background-color: var(--accent, #1a73e8);
+      color: white;
+    }
+    #saveBtn:hover { background-color: var(--accent-hover, #1557b0); }
+    .empty-state {
+      text-align: center;
+      color: var(--text-secondary, #70757a);
+      font-size: 13px;
+      padding: 40px 10px;
+    }
+
+    /* About tab styles */
+    .about-content {
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .about-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+    }
+    .about-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text, #202124);
+      margin-bottom: 4px;
+    }
+    .about-version {
+      font-size: 13px;
+      color: var(--text-secondary, #70757a);
+      margin-bottom: 16px;
+    }
+    .about-desc {
+      font-size: 13px;
+      color: var(--text-secondary, #70757a);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .about-link {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: var(--accent, #1a73e8);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: background-color 0.2s ease;
+    }
+    .about-link:hover {
+      background-color: var(--accent-hover, #1557b0);
+    }
+
+    /* Theme circles */
+    .theme-circles {
+      display: flex;
+      gap: 6px;
+      margin-left: auto;
+      padding-right: 4px;
+    }
+    .theme-circle {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .theme-circle:hover {
+      transform: scale(1.15);
+    }
+    .theme-circle.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-alpha);
+    }
+    .theme-circle[data-theme="light"] { background: linear-gradient(135deg, #ffffff 50%, #1a73e8 50%); }
+    .theme-circle[data-theme="dark"] { background: linear-gradient(135deg, #1e1e1e 50%, #bb86fc 50%); }
+    .theme-circle[data-theme="warm"] { background: linear-gradient(135deg, #faf3e0 50%, #e07c24 50%); }
+
+    /* Theme: Light (default) */
+    body.theme-light {
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --text: #202124;
+      --text-secondary: #70757a;
+      --border: #dadce0;
+      --accent: #1a73e8;
+      --accent-alpha: rgba(26, 115, 232, 0.3);
+      --accent-hover: #1557b0;
+      --accent-bg: #e8f0fe;
+      --btn-bg: #dadce0;
+      --btn-hover: #bdc1c6;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    /* Theme: Dark */
+    body.theme-dark {
+      --bg: #1e1e1e;
+      --surface: #2d2d2d;
+      --text: #e0e0e0;
+      --text-secondary: #9e9e9e;
+      --border: #444444;
+      --accent: #bb86fc;
+      --accent-alpha: rgba(187, 134, 252, 0.3);
+      --accent-hover: #9b67e0;
+      --accent-bg: #332d40;
+      --btn-bg: #3c3c3c;
+      --btn-hover: #555555;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    body.theme-dark textarea {
+      background-color: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    body.theme-dark .saved-item {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    body.theme-dark .saved-item:hover {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+    }
+
+    /* Theme: Warm */
+    body.theme-warm {
+      --bg: #faf3e0;
+      --surface: #f5e6c8;
+      --text: #4a3728;
+      --text-secondary: #8b7355;
+      --border: #d4c5a9;
+      --accent: #e07c24;
+      --accent-alpha: rgba(224, 124, 36, 0.3);
+      --accent-hover: #c46a1a;
+      --accent-bg: #fde8c8;
+      --btn-bg: #d4c5a9;
+      --btn-hover: #c4b494;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    body.theme-warm textarea {
+      background-color: var(--surface);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    body.theme-warm .saved-item {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    body.theme-warm .saved-item:hover {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
-  <h3>📝 Study Note</h3>
-  <div id="status">Select text → Right-click "📝 Add to Memo" or drag and drop below</div>
-  <div id="dropZone">📌 Drop dragged text here</div>
-  <div class="btn-row">
-    <button id="clearBtn">🗑️ Clear All</button>
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab-item active" data-tab="editor">📝 Memo</div>
+    <div class="tab-item" data-tab="saved">💾 Saved</div>
+    <div class="tab-item" data-tab="about">ℹ️ About</div>
+    <div class="theme-circles">
+      <div class="theme-circle active" data-theme="light" title="Light"></div>
+      <div class="theme-circle" data-theme="dark" title="Dark"></div>
+      <div class="theme-circle" data-theme="warm" title="Warm"></div>
+    </div>
   </div>
-  <textarea id="memo" placeholder="Write your study notes here..."></textarea>
+
+  <!-- Tab 1: Editor -->
+  <div id="tab-editor" class="tab-content active">
+    <div class="btn-row">
+      <button id="saveBtn">💾 Save</button>
+      <button id="clearBtn">🗑️ Clear</button>
+    </div>
+    <textarea id="memo" placeholder="Write your study notes here..."></textarea>
+  </div>
+
+  <!-- Tab 2: Saved List -->
+  <div id="tab-saved" class="tab-content">
+    <ul class="saved-list" id="savedList"></ul>
+    <div class="empty-state" id="emptyState">No saved memos yet.</div>
+  </div>
+
+  <!-- Tab 3: About -->
+  <div id="tab-about" class="tab-content">
+    <div class="about-content">
+      <img class="about-icon" src="icon_48.png" alt="Simple Side Note">
+      <div class="about-name">Simple Side Note</div>
+      <div class="about-version" id="versionInfo">Version 1.0</div>
+      <div class="about-desc">
+        A simple notepad that lives in your browser sidebar.<br>
+        Select text on any webpage → Right-click "Add to Memo"<br>
+        Auto-save, themes, and export to Word.
+      </div>
+      <a class="about-link" id="helpLink" href="#" target="_blank">📖 How to Use</a>
+    </div>
+  </div>
+
   <script src="sidepanel.js"></script>
 </body>
 </html>

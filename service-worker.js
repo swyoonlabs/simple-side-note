@@ -7,7 +7,7 @@ chrome.sidePanel
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "addToMemo",
-    title: "📝 Add to Memo",
+    title: "Add to Memo",
     contexts: ["selection"]
   });
 });
