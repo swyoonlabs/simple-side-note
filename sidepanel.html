@@ -2,21 +2,77 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <link href="lib/quill.snow.css" rel="stylesheet">
   <style>
     body { width: 100%; padding: 15px; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--bg, #ffffff); color: var(--text, #202124); }
     h3 { color: var(--text, #202124); margin-top: 0; }
-    textarea { 
-      width: 100%; 
-      height: 75vh; 
-      padding: 10px; 
-      border: 1px solid var(--border, #dadce0); 
-      border-radius: 8px; 
-      resize: none;
-      font-size: 14px;
-      box-sizing: border-box;
-      background-color: var(--surface, #f8f9fa);
-      color: var(--text, #202124);
+
+    /* Quill editor overrides */
+    .ql-toolbar.ql-snow {
+      border: 1px solid var(--border, #dadce0) !important;
+      border-radius: 8px 8px 0 0 !important;
+      background-color: var(--surface, #f8f9fa) !important;
     }
+    .ql-container.ql-snow {
+      border: 1px solid var(--border, #dadce0) !important;
+      border-top: none !important;
+      border-radius: 0 0 8px 8px !important;
+      font-size: 14px !important;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+      height: 65vh !important;
+      background-color: var(--surface, #f8f9fa) !important;
+      color: var(--text, #202124) !important;
+    }
+    .ql-editor {
+      padding: 10px !important;
+      line-height: 1.6 !important;
+    }
+    .ql-editor.ql-blank::before {
+      color: var(--text-secondary, #70757a) !important;
+      font-style: normal !important;
+    }
+    .ql-snow .ql-stroke {
+      stroke: var(--text, #202124) !important;
+    }
+    .ql-snow .ql-fill {
+      fill: var(--text, #202124) !important;
+    }
+    .ql-snow .ql-picker-label {
+      color: var(--text, #202124) !important;
+    }
+    .ql-snow .ql-picker-options {
+      background-color: var(--bg, #ffffff) !important;
+      border-color: var(--border, #dadce0) !important;
+    }
+    .ql-snow .ql-picker-item {
+      color: var(--text, #202124) !important;
+    }
+    .ql-snow .ql-active .ql-stroke {
+      stroke: var(--accent, #1a73e8) !important;
+    }
+    .ql-snow .ql-active .ql-fill {
+      fill: var(--accent, #1a73e8) !important;
+    }
+    .ql-snow .ql-active {
+      color: var(--accent, #1a73e8) !important;
+    }
+    .ql-snow .ql-toolbar button:hover .ql-stroke {
+      stroke: var(--accent, #1a73e8) !important;
+    }
+    .ql-snow .ql-toolbar button:hover .ql-fill {
+      fill: var(--accent, #1a73e8) !important;
+    }
+    /* Fix toolbar button hover */
+    .ql-toolbar.ql-snow button:hover {
+      color: var(--accent, #1a73e8) !important;
+    }
+    .ql-toolbar.ql-snow button:hover .ql-stroke {
+      stroke: var(--accent, #1a73e8) !important;
+    }
+    .ql-toolbar.ql-snow button:hover .ql-fill {
+      fill: var(--accent, #1a73e8) !important;
+    }
+
     .btn-row {
       display: flex;
       gap: 8px;
@@ -31,11 +87,11 @@
       cursor: pointer;
       box-sizing: border-box;
     }
-    #clearBtn {
+    #newBtn {
       background-color: var(--btn-bg, #dadce0);
       color: var(--text, #202124);
     }
-    #clearBtn:hover { background-color: var(--btn-hover, #bdc1c6); }
+    #newBtn:hover { background-color: var(--btn-hover, #bdc1c6); }
 
     /* Tab styles */
     .tab-bar {
@@ -173,15 +229,14 @@
     .about-link {
       display: inline-block;
       padding: 8px 16px;
-      background-color: var(--accent, #1a73e8);
-      color: white;
+      background-color: var(--btn-bg, #dadce0);
+      color: var(--text-secondary, #70757a);
       text-decoration: none;
       border-radius: 6px;
       font-size: 13px;
-      transition: background-color 0.2s ease;
-    }
-    .about-link:hover {
-      background-color: var(--accent-hover, #1557b0);
+      pointer-events: none;
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     /* Theme circles */
@@ -243,10 +298,33 @@
       background-color: var(--bg);
       color: var(--text);
     }
-    body.theme-dark textarea {
-      background-color: var(--surface);
-      color: var(--text);
-      border-color: var(--border);
+    body.theme-dark .ql-toolbar.ql-snow {
+      background-color: var(--surface) !important;
+      border-color: var(--border) !important;
+    }
+    body.theme-dark .ql-container.ql-snow {
+      background-color: var(--surface) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
+    body.theme-dark .ql-editor.ql-blank::before {
+      color: var(--text-secondary) !important;
+    }
+    body.theme-dark .ql-snow .ql-stroke {
+      stroke: var(--text) !important;
+    }
+    body.theme-dark .ql-snow .ql-fill {
+      fill: var(--text) !important;
+    }
+    body.theme-dark .ql-snow .ql-picker-label {
+      color: var(--text) !important;
+    }
+    body.theme-dark .ql-snow .ql-picker-options {
+      background-color: var(--bg) !important;
+      border-color: var(--border) !important;
+    }
+    body.theme-dark .ql-snow .ql-picker-item {
+      color: var(--text) !important;
     }
     body.theme-dark .saved-item {
       background: var(--surface);
@@ -273,10 +351,33 @@
       background-color: var(--bg);
       color: var(--text);
     }
-    body.theme-warm textarea {
-      background-color: var(--surface);
-      color: var(--text);
-      border-color: var(--border);
+    body.theme-warm .ql-toolbar.ql-snow {
+      background-color: var(--surface) !important;
+      border-color: var(--border) !important;
+    }
+    body.theme-warm .ql-container.ql-snow {
+      background-color: var(--surface) !important;
+      border-color: var(--border) !important;
+      color: var(--text) !important;
+    }
+    body.theme-warm .ql-editor.ql-blank::before {
+      color: var(--text-secondary) !important;
+    }
+    body.theme-warm .ql-snow .ql-stroke {
+      stroke: var(--text) !important;
+    }
+    body.theme-warm .ql-snow .ql-fill {
+      fill: var(--text) !important;
+    }
+    body.theme-warm .ql-snow .ql-picker-label {
+      color: var(--text) !important;
+    }
+    body.theme-warm .ql-snow .ql-picker-options {
+      background-color: var(--bg) !important;
+      border-color: var(--border) !important;
+    }
+    body.theme-warm .ql-snow .ql-picker-item {
+      color: var(--text) !important;
     }
     body.theme-warm .saved-item {
       background: var(--surface);
@@ -304,10 +405,11 @@
   <!-- Tab 1: Editor -->
   <div id="tab-editor" class="tab-content active">
     <div class="btn-row">
+      <button id="newBtn">📝 New</button>
       <button id="saveBtn">💾 Save</button>
-      <button id="clearBtn">🗑️ Clear</button>
     </div>
-    <textarea id="memo" placeholder="Write your study notes here..."></textarea>
+    <!-- Quill editor -->
+    <div id="editor"></div>
   </div>
 
   <!-- Tab 2: Saved List -->
@@ -331,6 +433,7 @@
     </div>
   </div>
 
+  <script src="lib/quill.min.js"></script>
   <script src="sidepanel.js"></script>
 </body>
 </html>
