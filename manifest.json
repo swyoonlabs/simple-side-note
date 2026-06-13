@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Simple Side Note",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Chrome extension sidebar notepad",
   "permissions": ["sidePanel", "storage", "contextMenus"],
   "background": {

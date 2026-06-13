@@ -8,16 +8,10 @@
     h3 { color: var(--text, #202124); margin-top: 0; }
 
     /* Quill editor overrides */
-    .ql-toolbar.ql-snow {
-      border: 1px solid var(--border, #dadce0) !important;
-      border-radius: 8px 8px 0 0 !important;
-      background-color: var(--surface, #f8f9fa) !important;
-    }
     .ql-container.ql-snow {
       border: 1px solid var(--border, #dadce0) !important;
-      border-top: none !important;
-      border-radius: 0 0 8px 8px !important;
-      font-size: 14px !important;
+      border-radius: 8px !important;
+      font-size: 18px !important;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
       height: 65vh !important;
       background-color: var(--surface, #f8f9fa) !important;
@@ -92,6 +86,46 @@
       color: var(--text, #202124);
     }
     #newBtn:hover { background-color: var(--btn-hover, #bdc1c6); }
+
+    .size-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .size-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border: 2px solid var(--border, #dadce0);
+      border-radius: 20px;
+      background: transparent;
+      color: var(--text, #202124);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .size-btn:hover { background: var(--border, #dadce0); }
+    .size-btn.active {
+      border-color: var(--accent, #1a73e8);
+      color: var(--accent, #1a73e8);
+      background: rgba(26, 115, 232, 0.08);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .color-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .color-btn:hover { opacity: 0.8; }
+    .color-btn.active { border-color: var(--accent, #1a73e8); }
 
     /* Tab styles */
     .tab-bar {
@@ -187,11 +221,7 @@
     .saved-item-delete:hover {
       color: #d93025;
     }
-    #saveBtn {
-      background-color: var(--accent, #1a73e8);
-      color: white;
-    }
-    #saveBtn:hover { background-color: var(--accent-hover, #1557b0); }
+
     .empty-state {
       text-align: center;
       color: var(--text-secondary, #70757a);
@@ -201,42 +231,92 @@
 
     /* About tab styles */
     .about-content {
+      padding: 24px 12px;
+    }
+    .about-header {
       text-align: center;
-      padding: 30px 10px;
-    }
-    .about-icon {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 12px;
-    }
-    .about-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text, #202124);
-      margin-bottom: 4px;
-    }
-    .about-version {
-      font-size: 13px;
-      color: var(--text-secondary, #70757a);
-      margin-bottom: 16px;
-    }
-    .about-desc {
-      font-size: 13px;
-      color: var(--text-secondary, #70757a);
-      line-height: 1.6;
       margin-bottom: 20px;
     }
-    .about-link {
-      display: inline-block;
-      padding: 8px 16px;
-      background-color: var(--btn-bg, #dadce0);
+    .about-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+    }
+    .about-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text, #202124);
+      margin-bottom: 3px;
+    }
+    .about-version {
+      font-size: 12px;
       color: var(--text-secondary, #70757a);
-      text-decoration: none;
-      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .about-tagline {
       font-size: 13px;
-      pointer-events: none;
-      opacity: 0.6;
-      cursor: not-allowed;
+      color: var(--text-secondary, #70757a);
+      line-height: 1.5;
+    }
+    .about-divider {
+      border: none;
+      border-top: 1px solid var(--border, #dadce0);
+      margin: 16px 0;
+    }
+    .about-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary, #70757a);
+      margin-bottom: 10px;
+    }
+    .about-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 16px 0;
+    }
+    .about-features li {
+      font-size: 13px;
+      color: var(--text, #202124);
+      padding: 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border, #dadce0);
+    }
+    .about-features li:last-child { border-bottom: none; }
+    .about-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .about-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .about-link:hover { opacity: 0.85; }
+    .about-link-blog {
+      background-color: var(--accent, #1a73e8);
+      color: #ffffff;
+    }
+    .about-link-privacy {
+      background-color: var(--btn-bg, #dadce0);
+      color: var(--text, #202124);
+    }
+    .about-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-secondary, #70757a);
     }
 
     /* Theme circles */
@@ -406,7 +486,16 @@
   <div id="tab-editor" class="tab-content active">
     <div class="btn-row">
       <button id="newBtn">📝 New</button>
-      <button id="saveBtn">💾 Save</button>
+    </div>
+    <div class="size-row">
+      <button class="size-btn" data-size="20px" style="font-size:14px">Large</button>
+      <button class="size-btn" data-size="26px" style="font-size:17px">Larger</button>
+      <button class="size-btn" data-size="34px" style="font-size:21px">Huge</button>
+    </div>
+    <div class="color-row">
+      <button class="color-btn" data-color="#202124" style="background:#202124" title="검정"></button>
+      <button class="color-btn" data-color="#e53935" style="background:#e53935" title="빨강"></button>
+      <button class="color-btn" data-color="#1565C0" style="background:#1565C0" title="파랑"></button>
     </div>
     <!-- Quill editor -->
     <div id="editor"></div>
@@ -421,15 +510,35 @@
   <!-- Tab 3: About -->
   <div id="tab-about" class="tab-content">
     <div class="about-content">
-      <img class="about-icon" src="icon_48.png" alt="Simple Side Note">
-      <div class="about-name">Simple Side Note</div>
-      <div class="about-version" id="versionInfo">Version 1.0</div>
-      <div class="about-desc">
-        A simple notepad that lives in your browser sidebar.<br>
-        Select text on any webpage → Right-click "Add to Memo"<br>
-        Auto-save, themes, and export to Word.
+      <div class="about-header">
+        <img class="about-icon" src="icon_48.png" alt="Simple Side Note">
+        <div class="about-name">Simple Side Note</div>
+        <div class="about-version" id="versionInfo">Version 1.0.2</div>
+        <div class="about-tagline">A lightweight memo pad that lives<br>right in your browser sidebar.</div>
       </div>
-      <a class="about-link" id="helpLink" href="#" target="_blank">📖 How to Use</a>
+
+      <hr class="about-divider">
+
+      <div class="about-section-title">Features</div>
+      <ul class="about-features">
+        <li>📝 Quick notes while browsing — always one click away</li>
+        <li>🖱️ Right-click any text → <em>Add to Memo</em></li>
+        <li>💾 Save &amp; organize multiple memos</li>
+        <li>🔤 Font size control: Large / Larger / Huge</li>
+        <li>🎨 Font colors: Black, Red, Blue</li>
+        <li>🌗 Themes: Light / Dark / Warm</li>
+        <li>📥 Export memos as Word (.doc)</li>
+      </ul>
+
+      <hr class="about-divider">
+
+      <div class="about-section-title">Links</div>
+      <div class="about-links">
+        <a class="about-link about-link-blog" href="https://swyoonlabs.blogspot.com/" target="_blank">🌐 Developer Blog</a>
+        <a class="about-link about-link-privacy" href="privacy-policy.html" target="_blank">🔒 Privacy Policy</a>
+      </div>
+
+      <div class="about-footer">Made with ☕ by swyoonlabs</div>
     </div>
   </div>
 

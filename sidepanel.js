@@ -1,5 +1,5 @@
 const newBtn = document.getElementById('newBtn');
-const saveBtn = document.getElementById('saveBtn');
+
 const savedList = document.getElementById('savedList');
 const emptyState = document.getElementById('emptyState');
 
@@ -7,19 +7,60 @@ const emptyState = document.getElementById('emptyState');
 let currentMemoId = null;
 
 // ===== Initialize Quill Editor =====
+const SizeStyle = Quill.import('attributors/style/size');
+SizeStyle.whitelist = ['20px', '26px', '34px'];
+Quill.register(SizeStyle, true);
+
 const quill = new Quill('#editor', {
   theme: 'snow',
   placeholder: 'Write your study notes here...',
   modules: {
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-      ['clean']
-    ]
+    toolbar: false
   }
+});
+
+// ===== Font size buttons =====
+document.querySelectorAll('.size-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const size = btn.dataset.size;
+    const current = quill.getFormat()['size'];
+    if (current === size) {
+      quill.format('size', false);
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+    } else {
+      quill.format('size', size);
+      document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    quill.focus();
+  });
+});
+
+quill.on('selection-change', () => {
+  const fmt = quill.getFormat();
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.size === fmt['size']);
+  });
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.color === fmt['color']);
+  });
+});
+
+// ===== Font color buttons =====
+document.querySelectorAll('.color-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const color = btn.dataset.color;
+    const current = quill.getFormat()['color'];
+    if (current === color) {
+      quill.format('color', false);
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+    } else {
+      quill.format('color', color);
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+    quill.focus();
+  });
 });
 
 // ===== Theme switching =====
@@ -96,20 +137,22 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 // ===== 4. New memo =====
 newBtn.addEventListener('click', () => {
-  const textContent = quill.getText().trim();
-  if (textContent && !confirm('Start a new memo? Current unsaved content will be cleared.')) {
-    return;
-  }
-  quill.setContents([]);
-  chrome.storage.local.set({ studyMemo: '' });
-  chrome.storage.local.remove('memoEntries');
-  currentMemoId = null; // Reset to new memo mode
+  saveCurrentMemo(() => {
+    quill.setContents([]);
+    chrome.storage.local.set({ studyMemo: '' });
+    chrome.storage.local.remove('memoEntries');
+    currentMemoId = null;
+  });
 });
 
-// ===== 5. Save current memo to saved list (update if exists, insert if new) =====
-saveBtn.addEventListener('click', () => {
+
+// ===== Save helper =====
+function saveCurrentMemo(callback) {
   const textContent = quill.getText().trim();
-  if (!textContent) return;
+  if (!textContent) {
+    if (callback) callback();
+    return;
+  }
 
   const title = textContent.split('\n')[0].substring(0, 50);
 
@@ -118,7 +161,6 @@ saveBtn.addEventListener('click', () => {
     const htmlContent = quill.root.innerHTML;
 
     if (currentMemoId !== null) {
-      // Update existing memo
       const index = savedMemos.findIndex(m => m.id === currentMemoId);
       if (index !== -1) {
         savedMemos[index].title = title;
@@ -126,7 +168,6 @@ saveBtn.addEventListener('click', () => {
         savedMemos[index].date = new Date().toLocaleString();
       }
     } else {
-      // Create new memo
       const savedMemo = {
         id: Date.now(),
         title: title,
@@ -137,9 +178,11 @@ saveBtn.addEventListener('click', () => {
       savedMemos.unshift(savedMemo);
     }
 
-    chrome.storage.local.set({ savedMemos: savedMemos });
+    chrome.storage.local.set({ savedMemos: savedMemos }, () => {
+      if (callback) callback();
+    });
   });
-});
+}
 
 // ===== 6. Render saved list =====
 function renderSavedList() {
