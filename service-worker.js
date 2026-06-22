@@ -22,7 +22,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       timestamp: timestamp,
       url: info.pageUrl || (tab && tab.url) || ''
     };
-    
+
     chrome.storage.local.get(['memoEntries'], (result) => {
       const entries = result.memoEntries || [];
       entries.push(entry);
@@ -30,3 +30,4 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     });
   }
 });
+

@@ -115,6 +115,25 @@ quill.on('text-change', () => {
   chrome.storage.local.set({ studyMemo: content });
 });
 
+// ===== 2b. Handle paste events (for images) =====
+quill.root.addEventListener('paste', (e) => {
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (let item of items) {
+    if (item.type.indexOf('image') !== -1) {
+      e.preventDefault();
+      const file = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const index = quill.getSelection().index;
+        quill.insertEmbed(index, 'image', event.target.result);
+        quill.setSelection(index + 1);
+        chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+});
+
 // ===== 3. Detect text added from context menu =====
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'local' && changes.memoEntries) {
@@ -144,6 +163,7 @@ newBtn.addEventListener('click', () => {
     currentMemoId = null;
   });
 });
+
 
 
 // ===== Save helper =====
@@ -198,7 +218,7 @@ function renderSavedList() {
         '<div class="saved-item-title">' + escapeHtml(memo.title) + '</div>' +
         '<div class="saved-item-date">' + escapeHtml(memo.date) + '</div>' +
         '<div class="saved-item-actions">' +
-          '<button class="saved-item-download" title="Download as .doc">📥</button>' +
+          '<button class="saved-item-download" title="Download as .html">📥</button>' +
           '<button class="saved-item-delete" data-id="' + memo.id + '" title="Delete">✕</button>' +
         '</div>';
       
@@ -248,20 +268,28 @@ function deleteSavedMemo(id) {
   });
 }
 
-// ===== 8. Download memo as .doc file =====
+// ===== 8. Download memo as .html file =====
 function downloadDocx(memo) {
-  // Use HTML content directly for rich formatting in Word
   const html = '<!DOCTYPE html>' +
-    '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
-    '<head><meta charset="utf-8"><title>' + escapeHtml(memo.title) + '</title>' +
-    '<style>body{font-family:Calibri,sans-serif;font-size:14px;line-height:1.6;padding:20px;} p{margin:0 0 8px 0;} h1,h2,h3{margin:12px 0 6px 0;}</style>' +
-    '</head><body>' + memo.content + '</body></html>';
+    '<html lang="ko"><head>' +
+    '<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>' + escapeHtml(memo.title) + '</title>' +
+    '<style>' +
+    'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 40px; margin: 0; background: #fff; color: #202124; }' +
+    'img { max-width: 100%; height: auto; margin: 10px 0; }' +
+    'h1, h2, h3, h4, h5, h6 { margin-top: 16px; margin-bottom: 8px; }' +
+    'p { margin: 0 0 8px 0; }' +
+    '</style>' +
+    '</head><body>' +
+    '<h1>' + escapeHtml(memo.title) + '</h1>' +
+    memo.content +
+    '</body></html>';
 
-  const blob = new Blob(['\ufeff' + html], { type: 'application/msword' });
+  const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = memo.title.replace(/[^a-zA-Z0-9가-힣\u4e00-\u9fff]/g, '_') + '.doc';
+  a.download = memo.title.replace(/[^a-zA-Z0-9가-힣\u4e00-\u9fff]/g, '_') + '.html';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -274,3 +302,16 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
+// ===== 9. Insert image to editor =====
+function insertImageToEditor(imageUrl) {
+  quill.focus();
+  const index = quill.getLength();
+  quill.insertText(index, '\n');
+  quill.insertEmbed(index + 1, 'image', imageUrl);
+  quill.setSelection(index + 2);
+  setTimeout(() => {
+    chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
+  }, 100);
+}
+
