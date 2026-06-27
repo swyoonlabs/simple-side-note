@@ -3,8 +3,19 @@ const newBtn = document.getElementById('newBtn');
 const savedList = document.getElementById('savedList');
 const emptyState = document.getElementById('emptyState');
 
+// Search elements
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearSearch');
+const noResults = document.getElementById('noResults');
+
+// Initialize search UI - hide clear button initially
+if (clearBtn) {
+  clearBtn.classList.add('hidden');
+}
+
 // Track current editing memo ID (null = new memo)
 let currentMemoId = null;
+let currentSearchQuery = '';
 
 // ===== Initialize Quill Editor =====
 const SizeStyle = Quill.import('attributors/style/size');
@@ -209,19 +220,34 @@ function renderSavedList() {
   chrome.storage.local.get(['savedMemos'], (result) => {
     const savedMemos = result.savedMemos || [];
     savedList.innerHTML = '';
-    emptyState.style.display = savedMemos.length === 0 ? 'block' : 'none';
 
-    savedMemos.forEach((memo) => {
+    // Filter memos based on search query
+    const filteredMemos = savedMemos.filter(memo => memoMatchesQuery(memo, currentSearchQuery));
+
+    // Show/hide empty states
+    if (savedMemos.length === 0) {
+      emptyState.style.display = 'block';
+      emptyState.textContent = 'No saved memos yet.';
+      noResults.style.display = 'none';
+    } else if (filteredMemos.length === 0) {
+      emptyState.style.display = 'none';
+      noResults.style.display = 'block';
+    } else {
+      emptyState.style.display = 'none';
+      noResults.style.display = 'none';
+    }
+
+    filteredMemos.forEach((memo) => {
       const li = document.createElement('li');
       li.className = 'saved-item';
-      li.innerHTML = 
-        '<div class="saved-item-title">' + escapeHtml(memo.title) + '</div>' +
+      li.innerHTML =
+        '<div class="saved-item-title">' + highlightSearchTerm(memo.title, currentSearchQuery) + '</div>' +
         '<div class="saved-item-date">' + escapeHtml(memo.date) + '</div>' +
         '<div class="saved-item-actions">' +
           '<button class="saved-item-download" title="Download as .html">📥</button>' +
           '<button class="saved-item-delete" data-id="' + memo.id + '" title="Delete">✕</button>' +
         '</div>';
-      
+
       // Click to load memo
       li.addEventListener('click', (e) => {
         if (e.target.closest('.saved-item-actions')) return;
@@ -313,5 +339,53 @@ function insertImageToEditor(imageUrl) {
   setTimeout(() => {
     chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
   }, 100);
+}
+
+// ===== Search functionality =====
+// Search input event
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    currentSearchQuery = searchInput.value.trim();
+    if (clearBtn) clearBtn.classList.toggle('hidden', !currentSearchQuery);
+    renderSavedList();
+  });
+}
+
+// Clear search button
+if (clearBtn) {
+  clearBtn.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    currentSearchQuery = '';
+    clearBtn.classList.add('hidden');
+    renderSavedList();
+  });
+}
+
+// Highlight search terms in text
+function highlightSearchTerm(text, query) {
+  if (!query) return escapeHtml(text);
+  const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+  return escapeHtml(text).replace(regex, '<span class="search-highlight">$1</span>');
+}
+
+// Escape special regex characters
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Check if memo matches search query
+function memoMatchesQuery(memo, query) {
+  if (!query) return true;
+  const lowerQuery = query.toLowerCase();
+  const lowerTitle = memo.title.toLowerCase();
+  const lowerContent = stripHtml(memo.content).toLowerCase();
+  return lowerTitle.includes(lowerQuery) || lowerContent.includes(lowerQuery);
+}
+
+// Strip HTML tags for search
+function stripHtml(html) {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
 }
 

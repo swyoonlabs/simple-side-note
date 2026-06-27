@@ -23,3 +23,6 @@ build/
 # Environment files
 .env
 .env.local
+
+# Claude Code local settings (contains API keys)
+.claude/settings.local.json
