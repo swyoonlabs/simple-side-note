@@ -1,4 +1,6 @@
 const newBtn = document.getElementById('newBtn');
+const saveBtn = document.getElementById('saveBtn');
+const titleInput = document.getElementById('titleInput');
 
 const savedList = document.getElementById('savedList');
 const emptyState = document.getElementById('emptyState');
@@ -7,6 +9,42 @@ const emptyState = document.getElementById('emptyState');
 const searchInput = document.getElementById('searchInput');
 const clearBtn = document.getElementById('clearSearch');
 const noResults = document.getElementById('noResults');
+const sortSelect = document.getElementById('sortSelect');
+
+// Confirm dialog elements
+const confirmOverlay = document.getElementById('confirmOverlay');
+const confirmMessage = document.getElementById('confirmMessage');
+const confirmOk = document.getElementById('confirmOk');
+const confirmCancel = document.getElementById('confirmCancel');
+
+// ===== Settings =====
+const DEFAULT_SETTINGS = {
+  autoPreserveDraft: false, // silently keep unsaved editor content across sessions
+  warnUnsaved: true,        // confirm before discarding unsaved changes
+  confirmDelete: true,      // confirm before deleting a saved memo
+  captureUrl: false         // append source URL when using "Add to Memo"
+};
+let settings = Object.assign({}, DEFAULT_SETTINGS);
+
+const settingControls = {
+  autoPreserveDraft: document.getElementById('setAutoPreserve'),
+  warnUnsaved: document.getElementById('setWarnUnsaved'),
+  confirmDelete: document.getElementById('setConfirmDelete'),
+  captureUrl: document.getElementById('setCaptureUrl')
+};
+
+chrome.storage.local.get(['settings'], (result) => {
+  settings = Object.assign({}, DEFAULT_SETTINGS, result.settings || {});
+  Object.keys(settingControls).forEach((key) => {
+    const el = settingControls[key];
+    if (!el) return;
+    el.checked = !!settings[key];
+    el.addEventListener('change', () => {
+      settings[key] = el.checked;
+      chrome.storage.local.set({ settings: settings });
+    });
+  });
+});
 
 // Initialize search UI - hide clear button initially
 if (clearBtn) {
@@ -16,6 +54,8 @@ if (clearBtn) {
 // Track current editing memo ID (null = new memo)
 let currentMemoId = null;
 let currentSearchQuery = '';
+let currentSort = 'recent';
+let isDirty = false; // true when the editor has unsaved changes
 
 // ===== Initialize Quill Editor =====
 const SizeStyle = Quill.import('attributors/style/size');
@@ -47,8 +87,11 @@ document.querySelectorAll('.size-btn').forEach(btn => {
   });
 });
 
-quill.on('selection-change', () => {
-  const fmt = quill.getFormat();
+quill.on('selection-change', (range) => {
+  // range is null when the editor loses focus (e.g. clicking the title input).
+  // Passing the range explicitly avoids getFormat() forcing focus back here.
+  if (!range) return;
+  const fmt = quill.getFormat(range);
   document.querySelectorAll('.size-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.size === fmt['size']);
   });
@@ -114,16 +157,52 @@ document.querySelectorAll('.tab-item').forEach(tab => {
 });
 
 // ===== 1. Load saved memo (initialize) =====
-chrome.storage.local.get(['studyMemo'], (result) => {
+chrome.storage.local.get(['studyMemo', 'studyMemoTitle', 'sortOrder', 'currentMemoId'], (result) => {
   if (result.studyMemo) {
     quill.root.innerHTML = result.studyMemo;
   }
+  if (titleInput && result.studyMemoTitle) {
+    titleInput.value = result.studyMemoTitle;
+  }
+  if (sortSelect && result.sortOrder) {
+    currentSort = result.sortOrder;
+    sortSelect.value = result.sortOrder;
+  }
+  if (typeof result.currentMemoId !== 'undefined') {
+    currentMemoId = result.currentMemoId;
+  }
+  // Content restored from the last save = clean state
+  isDirty = false;
+  updateSaveState();
 });
 
-// ===== 2. Real-time auto-save on text change =====
+// Editing the title marks the memo as unsaved
+if (titleInput) {
+  titleInput.addEventListener('input', () => {
+    isDirty = true;
+    updateSaveState();
+    if (settings.autoPreserveDraft) {
+      chrome.storage.local.set({ studyMemoTitle: titleInput.value });
+    }
+  });
+}
+
+// Sort control
+if (sortSelect) {
+  sortSelect.addEventListener('change', () => {
+    currentSort = sortSelect.value;
+    chrome.storage.local.set({ sortOrder: currentSort });
+    renderSavedList();
+  });
+}
+
+// ===== 2. Mark unsaved on text change (optionally preserve draft) =====
 quill.on('text-change', () => {
-  const content = quill.root.innerHTML;
-  chrome.storage.local.set({ studyMemo: content });
+  isDirty = true;
+  updateSaveState();
+  if (settings.autoPreserveDraft) {
+    chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
+  }
 });
 
 // ===== 2b. Handle paste events (for images) =====
@@ -138,7 +217,7 @@ quill.root.addEventListener('paste', (e) => {
         const index = quill.getSelection().index;
         quill.insertEmbed(index, 'image', event.target.result);
         quill.setSelection(index + 1);
-        chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
+        // insertEmbed fires text-change → isDirty is set automatically
       };
       reader.readAsDataURL(file);
     }
@@ -153,29 +232,70 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
       const oldEntries = changes.memoEntries.oldValue || [];
       const newItems = entries.slice(oldEntries.length);
       
-      const editorEl = quill.root;
       newItems.forEach((entry) => {
         const header = '📝 [' + entry.timestamp + ']';
-        quill.insertText(quill.getLength() - 1, '\n' + header + '\n' + entry.text + '\n');
+        let block = '\n' + header + '\n' + entry.text + '\n';
+        if (settings.captureUrl && entry.url) {
+          block += '🔗 ' + entry.url + '\n';
+        }
+        quill.insertText(quill.getLength() - 1, block);
       });
-      
-      chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
+
+      // insertText fires text-change → isDirty is set; user must Save to persist
       chrome.storage.local.remove('memoEntries');
     }
   }
 });
 
 // ===== 4. New memo =====
+function startNewMemo() {
+  quill.setContents([]);
+  if (titleInput) titleInput.value = '';
+  currentMemoId = null;
+  isDirty = false;
+  updateSaveState();
+  chrome.storage.local.set({ studyMemo: '', studyMemoTitle: '', currentMemoId: null });
+  chrome.storage.local.remove('memoEntries');
+}
+
 newBtn.addEventListener('click', () => {
+  if (settings.warnUnsaved && isDirty && quill.getText().trim()) {
+    showConfirm('Discard unsaved changes and start a new memo?', 'Discard').then((ok) => {
+      if (ok) startNewMemo();
+    });
+  } else {
+    startNewMemo();
+  }
+});
+
+// ===== 4b. Save button =====
+saveBtn.addEventListener('click', () => {
+  if (!quill.getText().trim()) return; // nothing to save
   saveCurrentMemo(() => {
-    quill.setContents([]);
-    chrome.storage.local.set({ studyMemo: '' });
-    chrome.storage.local.remove('memoEntries');
-    currentMemoId = null;
+    isDirty = false;
+    flashSaved();
+    renderSavedList();
   });
 });
 
+// Reflect unsaved state on the Save button
+function updateSaveState() {
+  if (!saveBtn) return;
+  saveBtn.textContent = isDirty ? '💾 Save •' : '💾 Save';
+  saveBtn.classList.toggle('dirty', isDirty);
+}
 
+// Briefly confirm a successful save
+function flashSaved() {
+  if (!saveBtn) return;
+  saveBtn.textContent = '✓ Saved';
+  saveBtn.classList.remove('dirty');
+  saveBtn.disabled = true;
+  setTimeout(() => {
+    saveBtn.disabled = false;
+    updateSaveState();
+  }, 1200);
+}
 
 // ===== Save helper =====
 function saveCurrentMemo(callback) {
@@ -185,44 +305,69 @@ function saveCurrentMemo(callback) {
     return;
   }
 
-  const title = textContent.split('\n')[0].substring(0, 50);
+  // Prefer the user-entered title; fall back to first line of content
+  const typedTitle = titleInput ? titleInput.value.trim() : '';
+  const title = typedTitle || textContent.split('\n')[0].substring(0, 50);
 
   chrome.storage.local.get(['savedMemos'], (result) => {
     const savedMemos = result.savedMemos || [];
     const htmlContent = quill.root.innerHTML;
 
-    if (currentMemoId !== null) {
-      const index = savedMemos.findIndex(m => m.id === currentMemoId);
-      if (index !== -1) {
-        savedMemos[index].title = title;
-        savedMemos[index].content = htmlContent;
-        savedMemos[index].date = new Date().toLocaleString();
-      }
+    const index = currentMemoId !== null
+      ? savedMemos.findIndex(m => m.id === currentMemoId)
+      : -1;
+
+    if (index !== -1) {
+      savedMemos[index].title = title;
+      savedMemos[index].content = htmlContent;
+      savedMemos[index].date = new Date().toLocaleString();
     } else {
+      // New memo, or the tracked memo no longer exists (e.g. was deleted)
       const savedMemo = {
         id: Date.now(),
         title: title,
         content: htmlContent,
-        date: new Date().toLocaleString()
+        date: new Date().toLocaleString(),
+        pinned: false
       };
       currentMemoId = savedMemo.id;
       savedMemos.unshift(savedMemo);
     }
 
-    chrome.storage.local.set({ savedMemos: savedMemos }, () => {
+    chrome.storage.local.set({
+      savedMemos: savedMemos,
+      studyMemo: htmlContent,
+      studyMemoTitle: title,
+      currentMemoId: currentMemoId
+    }, () => {
       if (callback) callback();
     });
   });
 }
 
 // ===== 6. Render saved list =====
+function sortMemos(memos) {
+  const sorted = memos.slice();
+  sorted.sort((a, b) => {
+    // Pinned memos always come first
+    if (!!a.pinned !== !!b.pinned) return a.pinned ? -1 : 1;
+    if (currentSort === 'oldest') return a.id - b.id;
+    if (currentSort === 'title') {
+      return (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' });
+    }
+    // default: recent (newest id first)
+    return b.id - a.id;
+  });
+  return sorted;
+}
+
 function renderSavedList() {
   chrome.storage.local.get(['savedMemos'], (result) => {
     const savedMemos = result.savedMemos || [];
     savedList.innerHTML = '';
 
-    // Filter memos based on search query
-    const filteredMemos = savedMemos.filter(memo => memoMatchesQuery(memo, currentSearchQuery));
+    // Filter memos based on search query, then sort (pinned first)
+    const filteredMemos = sortMemos(savedMemos.filter(memo => memoMatchesQuery(memo, currentSearchQuery)));
 
     // Show/hide empty states
     if (savedMemos.length === 0) {
@@ -239,11 +384,14 @@ function renderSavedList() {
 
     filteredMemos.forEach((memo) => {
       const li = document.createElement('li');
-      li.className = 'saved-item';
+      li.className = 'saved-item' + (memo.pinned ? ' pinned' : '');
+      const pinPrefix = memo.pinned ? '📌 ' : '';
       li.innerHTML =
-        '<div class="saved-item-title">' + highlightSearchTerm(memo.title, currentSearchQuery) + '</div>' +
+        '<div class="saved-item-title">' + pinPrefix + highlightSearchTerm(memo.title, currentSearchQuery) + '</div>' +
         '<div class="saved-item-date">' + escapeHtml(memo.date) + '</div>' +
         '<div class="saved-item-actions">' +
+          '<button class="saved-item-pin" title="' + (memo.pinned ? 'Unpin' : 'Pin to top') + '">📌</button>' +
+          '<button class="saved-item-md" title="Download as .md">📄</button>' +
           '<button class="saved-item-download" title="Download as .html">📥</button>' +
           '<button class="saved-item-delete" data-id="' + memo.id + '" title="Delete">✕</button>' +
         '</div>';
@@ -251,17 +399,29 @@ function renderSavedList() {
       // Click to load memo
       li.addEventListener('click', (e) => {
         if (e.target.closest('.saved-item-actions')) return;
-        currentMemoId = memo.id; // Track which memo is being edited
-        quill.root.innerHTML = memo.content;
-        chrome.storage.local.set({ studyMemo: memo.content });
-        // Switch to editor tab
-        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelector('[data-tab="editor"]').classList.add('active');
-        document.getElementById('tab-editor').classList.add('active');
+        const doLoad = () => loadMemoIntoEditor(memo);
+        if (settings.warnUnsaved && isDirty && quill.getText().trim() && memo.id !== currentMemoId) {
+          showConfirm('Discard unsaved changes and open this memo?', 'Discard').then((ok) => {
+            if (ok) doLoad();
+          });
+        } else {
+          doLoad();
+        }
       });
 
-      // Download button
+      // Pin toggle
+      li.querySelector('.saved-item-pin').addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePin(memo.id);
+      });
+
+      // Markdown download
+      li.querySelector('.saved-item-md').addEventListener('click', (e) => {
+        e.stopPropagation();
+        downloadMarkdown(memo);
+      });
+
+      // HTML download
       li.querySelector('.saved-item-download').addEventListener('click', (e) => {
         e.stopPropagation();
         downloadDocx(memo);
@@ -270,13 +430,48 @@ function renderSavedList() {
       // Delete button
       li.querySelector('.saved-item-delete').addEventListener('click', (e) => {
         e.stopPropagation();
-        if (confirm('Delete this saved memo?')) {
+        if (!settings.confirmDelete) {
           deleteSavedMemo(memo.id);
+          return;
         }
+        showConfirm('Delete this saved memo?', 'Delete').then((ok) => {
+          if (ok) deleteSavedMemo(memo.id);
+        });
       });
 
       savedList.appendChild(li);
     });
+  });
+}
+
+// ===== 6a. Load a saved memo into the editor =====
+function loadMemoIntoEditor(memo) {
+  currentMemoId = memo.id;
+  quill.root.innerHTML = memo.content;
+  if (titleInput) titleInput.value = memo.title || '';
+  isDirty = false;
+  updateSaveState();
+  chrome.storage.local.set({
+    studyMemo: memo.content,
+    studyMemoTitle: memo.title || '',
+    currentMemoId: memo.id
+  });
+  // Switch to editor tab
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelector('[data-tab="editor"]').classList.add('active');
+  document.getElementById('tab-editor').classList.add('active');
+}
+
+// ===== 6b. Toggle pin state =====
+function togglePin(id) {
+  chrome.storage.local.get(['savedMemos'], (result) => {
+    const savedMemos = result.savedMemos || [];
+    const memo = savedMemos.find(m => m.id === id);
+    if (memo) {
+      memo.pinned = !memo.pinned;
+      chrome.storage.local.set({ savedMemos: savedMemos }, renderSavedList);
+    }
   });
 }
 
@@ -285,9 +480,11 @@ function deleteSavedMemo(id) {
   chrome.storage.local.get(['savedMemos'], (result) => {
     const savedMemos = (result.savedMemos || []).filter(m => m.id !== id);
     chrome.storage.local.set({ savedMemos: savedMemos }, () => {
-      // If the deleted memo was being edited, reset to new memo mode
+      // If the deleted memo was being edited, detach it so a later Save
+      // creates a fresh entry instead of silently doing nothing.
       if (currentMemoId === id) {
         currentMemoId = null;
+        chrome.storage.local.set({ currentMemoId: null });
       }
       renderSavedList();
     });
@@ -329,16 +526,107 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
-// ===== 9. Insert image to editor =====
-function insertImageToEditor(imageUrl) {
-  quill.focus();
-  const index = quill.getLength();
-  quill.insertText(index, '\n');
-  quill.insertEmbed(index + 1, 'image', imageUrl);
-  quill.setSelection(index + 2);
-  setTimeout(() => {
-    chrome.storage.local.set({ studyMemo: quill.root.innerHTML });
-  }, 100);
+// ===== 8b. Download memo as .md (Markdown) file =====
+function htmlToMarkdown(html) {
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  // Convert inline formatting within a node to Markdown text
+  function inline(node) {
+    let out = '';
+    node.childNodes.forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        out += child.textContent;
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        const tag = child.tagName.toLowerCase();
+        const inner = inline(child);
+        if (tag === 'strong' || tag === 'b') out += '**' + inner + '**';
+        else if (tag === 'em' || tag === 'i') out += '*' + inner + '*';
+        else if (tag === 's' || tag === 'strike' || tag === 'del') out += '~~' + inner + '~~';
+        else if (tag === 'code') out += '`' + inner + '`';
+        else if (tag === 'a') out += '[' + inner + '](' + (child.getAttribute('href') || '') + ')';
+        else if (tag === 'img') out += '![](' + (child.getAttribute('src') || '') + ')';
+        else if (tag === 'br') out += '\n';
+        else out += inner; // spans (color/size), u, etc. → keep text
+      }
+    });
+    return out;
+  }
+
+  const lines = [];
+  Array.from(container.childNodes).forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const t = node.textContent.trim();
+      if (t) lines.push(t);
+      return;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) return;
+    const tag = node.tagName.toLowerCase();
+
+    if (/^h[1-6]$/.test(tag)) {
+      lines.push('#'.repeat(Number(tag[1])) + ' ' + inline(node).trim());
+    } else if (tag === 'ul' || tag === 'ol') {
+      let n = 1;
+      Array.from(node.children).forEach((li) => {
+        if (li.tagName.toLowerCase() !== 'li') return;
+        const listType = li.getAttribute('data-list');
+        const inner = inline(li).trim();
+        if (listType === 'bullet' || (tag === 'ul' && listType !== 'ordered')) {
+          lines.push('- ' + inner);
+        } else {
+          lines.push((n++) + '. ' + inner);
+        }
+      });
+    } else if (tag === 'blockquote') {
+      lines.push('> ' + inline(node).trim());
+    } else if (tag === 'img') {
+      lines.push('![](' + (node.getAttribute('src') || '') + ')');
+    } else {
+      // <p>, <div>, or anything else → paragraph (may be blank)
+      lines.push(inline(node).trim());
+    }
+  });
+
+  return lines.join('\n\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function downloadMarkdown(memo) {
+  const md = '# ' + memo.title + '\n\n' + htmlToMarkdown(memo.content) + '\n';
+  const blob = new Blob([md], { type: 'text/markdown; charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = memo.title.replace(/[^a-zA-Z0-9가-힣一-鿿]/g, '_') + '.md';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ===== Custom themed confirm dialog =====
+function showConfirm(message, okLabel) {
+  return new Promise((resolve) => {
+    if (!confirmOverlay) {
+      resolve(window.confirm(message));
+      return;
+    }
+    confirmMessage.textContent = message;
+    confirmOk.textContent = okLabel || 'OK';
+    confirmOverlay.classList.remove('hidden');
+
+    const cleanup = () => {
+      confirmOverlay.classList.add('hidden');
+      confirmOk.onclick = null;
+      confirmCancel.onclick = null;
+      confirmOverlay.onclick = null;
+    };
+    confirmOk.onclick = () => { cleanup(); resolve(true); };
+    confirmCancel.onclick = () => { cleanup(); resolve(false); };
+    // Click outside the modal cancels
+    confirmOverlay.onclick = (e) => {
+      if (e.target === confirmOverlay) { cleanup(); resolve(false); }
+    };
+  });
 }
 
 // ===== Search functionality =====

@@ -81,6 +81,13 @@
       cursor: pointer;
       box-sizing: border-box;
     }
+    #saveBtn {
+      background-color: var(--accent, #1a73e8);
+      color: #ffffff;
+    }
+    #saveBtn:hover { background-color: var(--accent-hover, #1557b0); }
+    #saveBtn:disabled { opacity: 0.7; cursor: default; }
+    #saveBtn.dirty { box-shadow: 0 0 0 2px var(--accent-alpha, rgba(26, 115, 232, 0.3)); }
     #newBtn {
       background-color: var(--btn-bg, #dadce0);
       color: var(--text, #202124);
@@ -136,9 +143,9 @@
     }
     .tab-item {
       flex: 1;
-      padding: 8px 12px;
+      padding: 8px 5px;
       text-align: center;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--text-secondary, #70757a);
       cursor: pointer;
@@ -281,6 +288,161 @@
       border-radius: 2px;
       padding: 0 2px;
     }
+
+    /* Title input */
+    .title-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      background-color: var(--bg, #ffffff);
+      color: var(--text, #202124);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .title-input:focus { border-color: var(--accent, #1a73e8); }
+    .title-input::placeholder { color: var(--text-secondary, #70757a); font-weight: 400; }
+
+    /* Sort control */
+    .sort-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .sort-row label {
+      font-size: 12px;
+      color: var(--text-secondary, #70757a);
+      white-space: nowrap;
+    }
+    #sortSelect {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 6px;
+      font-size: 12px;
+      background-color: var(--bg, #ffffff);
+      color: var(--text, #202124);
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* Pinned item */
+    .saved-item.pinned {
+      border-left: 3px solid var(--accent, #1a73e8);
+    }
+    .saved-item-pin:hover { color: var(--accent, #1a73e8); }
+
+    /* Settings tab */
+    .settings-content { padding: 8px 4px; }
+    .settings-content .about-section-title { margin-top: 8px; }
+    .setting-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 4px;
+      border-bottom: 1px solid var(--border, #dadce0);
+    }
+    .setting-item:last-child { border-bottom: none; }
+    .setting-text { flex: 1; }
+    .setting-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text, #202124);
+    }
+    .setting-desc {
+      font-size: 11px;
+      color: var(--text-secondary, #70757a);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    /* Toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: var(--btn-bg, #dadce0);
+      border-radius: 22px;
+      transition: background-color 0.2s;
+    }
+    .slider::before {
+      content: '';
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+    .switch input:checked + .slider { background: var(--accent, #1a73e8); }
+    .switch input:checked + .slider::before { transform: translateX(18px); }
+
+    /* Confirm modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: var(--bg, #ffffff);
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 300px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+    .modal-message {
+      font-size: 14px;
+      color: var(--text, #202124);
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .modal-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .modal-btn-cancel {
+      background: var(--btn-bg, #dadce0);
+      color: var(--text, #202124);
+    }
+    .modal-btn-cancel:hover { background: var(--btn-hover, #bdc1c6); }
+    .modal-btn-ok {
+      background: #d93025;
+      color: #fff;
+    }
+    .modal-btn-ok:hover { background: #b3271b; }
 
     /* About tab styles */
     .about-content {
@@ -527,6 +689,7 @@
   <div class="tab-bar">
     <div class="tab-item active" data-tab="editor">📝 Memo</div>
     <div class="tab-item" data-tab="saved">💾 Saved</div>
+    <div class="tab-item" data-tab="settings">⚙️ Settings</div>
     <div class="tab-item" data-tab="about">ℹ️ About</div>
     <div class="theme-circles">
       <div class="theme-circle active" data-theme="light" title="Light"></div>
@@ -538,8 +701,10 @@
   <!-- Tab 1: Editor -->
   <div id="tab-editor" class="tab-content active">
     <div class="btn-row">
+      <button id="saveBtn">💾 Save</button>
       <button id="newBtn">📝 New</button>
     </div>
+    <input type="text" id="titleInput" class="title-input" placeholder="Title (auto from first line if empty)" />
     <div class="size-row">
       <button class="size-btn" data-size="20px" style="font-size:14px">Large</button>
       <button class="size-btn" data-size="26px" style="font-size:17px">Larger</button>
@@ -560,9 +725,68 @@
       <input type="text" id="searchInput" placeholder="🔍 Search saved memos..." />
       <button id="clearSearch" class="clear-btn">✕</button>
     </div>
+    <div class="sort-row">
+      <label for="sortSelect">Sort</label>
+      <select id="sortSelect">
+        <option value="recent">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="title">Title (A–Z)</option>
+      </select>
+    </div>
     <ul class="saved-list" id="savedList"></ul>
     <div class="empty-state" id="emptyState">No saved memos yet.</div>
     <div class="empty-state" id="noResults" style="display:none;">No matching memos found.</div>
+  </div>
+
+  <!-- Tab: Settings -->
+  <div id="tab-settings" class="tab-content">
+    <div class="settings-content">
+      <div class="about-section-title">Editor</div>
+      <div class="setting-item">
+        <div class="setting-text">
+          <div class="setting-label">Auto-preserve draft</div>
+          <div class="setting-desc">Keep unsaved editor content when you close the panel, and restore it next time — even without pressing Save.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setAutoPreserve">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-text">
+          <div class="setting-label">Warn about unsaved changes</div>
+          <div class="setting-desc">Ask for confirmation before starting a new memo or opening another one while you have unsaved changes.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setWarnUnsaved">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="about-section-title">Saved memos</div>
+      <div class="setting-item">
+        <div class="setting-text">
+          <div class="setting-label">Confirm before deleting</div>
+          <div class="setting-desc">Show a confirmation dialog before a saved memo is permanently deleted.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setConfirmDelete">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="about-section-title">Capture</div>
+      <div class="setting-item">
+        <div class="setting-text">
+          <div class="setting-label">Include source URL</div>
+          <div class="setting-desc">When you use "Add to Memo" from a web page, also append the page's link below the captured text.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setCaptureUrl">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
   </div>
 
   <!-- Tab 3: About -->
@@ -571,7 +795,7 @@
       <div class="about-header">
         <img class="about-icon" src="icon_48.png" alt="Simple Side Note">
         <div class="about-name">Simple Side Note</div>
-        <div class="about-version" id="versionInfo">Version 1.0.4</div>
+        <div class="about-version" id="versionInfo">Version 1.1.0</div>
         <div class="about-tagline">A lightweight memo pad that lives<br>right in your browser sidebar.</div>
       </div>
 
@@ -581,11 +805,26 @@
       <ul class="about-features">
         <li>📝 Quick notes while browsing — always one click away</li>
         <li>🖱️ Right-click any text → <em>Add to Memo</em></li>
-        <li>💾 Save &amp; organize multiple memos</li>
+        <li>💾 Save with one click &amp; edit anytime</li>
+        <li>✏️ Custom titles &amp; 📌 pin favorites to top</li>
+        <li>🔍 Search &amp; 🔀 sort your saved memos</li>
         <li>🔤 Font size control: Large / Larger / Huge</li>
         <li>🎨 Font colors: Black, Red, Blue</li>
+        <li>🖼️ Paste images straight into a note</li>
         <li>🌗 Themes: Light / Dark / Warm</li>
-        <li>📥 Export memos as HTML (with images)</li>
+        <li>📥 Export memos as HTML or 📄 Markdown</li>
+        <li>⚙️ Settings tab to tailor how it works</li>
+      </ul>
+
+      <hr class="about-divider">
+
+      <div class="about-section-title">New in 1.1.0</div>
+      <ul class="about-features">
+        <li>💾 Explicit Save button (no more silent auto-save)</li>
+        <li>✏️ Editable memo titles</li>
+        <li>📌 Pin &amp; sort saved memos</li>
+        <li>📄 Markdown export</li>
+        <li>⚙️ New Settings tab</li>
       </ul>
 
       <hr class="about-divider">
@@ -599,6 +838,17 @@
       </div>
 
       <div class="about-footer">Made with ☕ by swyoonlabs</div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog -->
+  <div id="confirmOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-message" id="confirmMessage"></div>
+      <div class="modal-actions">
+        <button id="confirmCancel" class="modal-btn modal-btn-cancel">Cancel</button>
+        <button id="confirmOk" class="modal-btn modal-btn-ok">Delete</button>
+      </div>
     </div>
   </div>
 
