@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0] - 2026-07-10
+
+### New Features
+- **Full backup & restore** — New **Backup & Restore** section in Settings. **📤 Export all** saves every memo (title, content, pin, date) to a dated JSON file; **📥 Import** merges a backup back in. Import only ever *adds* — it never deletes existing memos, skips exact duplicates so re-importing is safe, and reassigns colliding ids to keep storage intact.
+- **Keyboard shortcuts** — **⌘/Ctrl+S** saves the current memo and **⌘/Ctrl+F** jumps to the saved-memo search. The modifier matches the OS (⌘ on macOS, Ctrl elsewhere) and the shortcut hint shows in each control's tooltip. Toggle the whole feature on/off in Settings.
+
+### Improvements
+- **OS-native system fonts** — The UI and editor now use the platform system font (SF on macOS, Segoe UI on Windows) instead of a Windows-only stack, matching the look of exported files.
+- **Save-failure awareness** — Importing checks `chrome.runtime.lastError`, so a failed write (e.g. storage quota) reports an error instead of silently appearing to succeed.
+
+### Bug Fixes
+- Fixed: color-button tooltips were in Korean while the rest of the UI is English — now Black / Red / Blue.
+
+---
+
 ## [1.1.0] - 2026-07-04
 
 ### New Features

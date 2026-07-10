@@ -11,6 +11,12 @@ const clearBtn = document.getElementById('clearSearch');
 const noResults = document.getElementById('noResults');
 const sortSelect = document.getElementById('sortSelect');
 
+// Backup / restore elements
+const exportAllBtn = document.getElementById('exportAllBtn');
+const importBtn = document.getElementById('importBtn');
+const importFile = document.getElementById('importFile');
+const backupStatus = document.getElementById('backupStatus');
+
 // Confirm dialog elements
 const confirmOverlay = document.getElementById('confirmOverlay');
 const confirmMessage = document.getElementById('confirmMessage');
@@ -19,10 +25,11 @@ const confirmCancel = document.getElementById('confirmCancel');
 
 // ===== Settings =====
 const DEFAULT_SETTINGS = {
-  autoPreserveDraft: false, // silently keep unsaved editor content across sessions
-  warnUnsaved: true,        // confirm before discarding unsaved changes
-  confirmDelete: true,      // confirm before deleting a saved memo
-  captureUrl: false         // append source URL when using "Add to Memo"
+  autoPreserveDraft: false,  // silently keep unsaved editor content across sessions
+  warnUnsaved: true,         // confirm before discarding unsaved changes
+  confirmDelete: true,       // confirm before deleting a saved memo
+  captureUrl: false,         // append source URL when using "Add to Memo"
+  keyboardShortcuts: true    // enable ⌘/Ctrl+S save & ⌘/Ctrl+F search shortcuts
 };
 let settings = Object.assign({}, DEFAULT_SETTINGS);
 
@@ -30,7 +37,8 @@ const settingControls = {
   autoPreserveDraft: document.getElementById('setAutoPreserve'),
   warnUnsaved: document.getElementById('setWarnUnsaved'),
   confirmDelete: document.getElementById('setConfirmDelete'),
-  captureUrl: document.getElementById('setCaptureUrl')
+  captureUrl: document.getElementById('setCaptureUrl'),
+  keyboardShortcuts: document.getElementById('setKeyboardShortcuts')
 };
 
 chrome.storage.local.get(['settings'], (result) => {
@@ -42,8 +50,10 @@ chrome.storage.local.get(['settings'], (result) => {
     el.addEventListener('change', () => {
       settings[key] = el.checked;
       chrome.storage.local.set({ settings: settings });
+      updateShortcutLabels();
     });
   });
+  updateShortcutLabels();
 });
 
 // Initialize search UI - hide clear button initially
@@ -56,6 +66,23 @@ let currentMemoId = null;
 let currentSearchQuery = '';
 let currentSort = 'recent';
 let isDirty = false; // true when the editor has unsaved changes
+
+// ===== OS detection (for native-feeling shortcut labels) =====
+// userAgentData.platform is the modern signal; fall back to navigator.platform.
+const isMac = /mac/i.test(
+  (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || ''
+);
+// On Mac the modifier reads as "⌘S", on Windows/Linux as "Ctrl+S".
+const modLabel = isMac ? '⌘' : 'Ctrl+';
+
+// Show the OS-appropriate shortcut as a tooltip when shortcuts are enabled,
+// and drop the hint when the user turns them off (doesn't disturb the dirty-state label).
+function updateShortcutLabels() {
+  const on = settings.keyboardShortcuts;
+  if (saveBtn) saveBtn.title = on ? 'Save (' + modLabel + 'S)' : 'Save';
+  if (searchInput) searchInput.title = on ? 'Search saved memos (' + modLabel + 'F)' : 'Search saved memos';
+}
+updateShortcutLabels();
 
 // ===== Initialize Quill Editor =====
 const SizeStyle = Quill.import('attributors/style/size');
@@ -276,6 +303,27 @@ saveBtn.addEventListener('click', () => {
     flashSaved();
     renderSavedList();
   });
+});
+
+// ===== 4c. Keyboard shortcuts =====
+// ⌘S / Ctrl+S → save, ⌘F / Ctrl+F → jump to the saved-memo search.
+// Match the modifier to the OS so Ctrl+S on Mac doesn't hijack the native ⌘S.
+document.addEventListener('keydown', (e) => {
+  if (!settings.keyboardShortcuts) return; // respect the Settings toggle
+  const modActive = isMac ? e.metaKey : e.ctrlKey;
+  if (!modActive || e.altKey) return;
+  const key = e.key.toLowerCase();
+  if (key === 's') {
+    e.preventDefault();
+    // Reuse the button's own click logic (empty-content guard, flash, re-render)
+    saveBtn.click();
+  } else if (key === 'f') {
+    e.preventDefault();
+    // Suppress the browser find bar; open the Saved tab and focus search instead
+    const savedTab = document.querySelector('.tab-item[data-tab="saved"]');
+    if (savedTab) savedTab.click();
+    if (searchInput) searchInput.focus();
+  }
 });
 
 // Reflect unsaved state on the Save button
@@ -601,6 +649,130 @@ function downloadMarkdown(memo) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+// ===== Backup & Restore =====
+function setBackupStatus(msg, isError) {
+  if (!backupStatus) return;
+  backupStatus.textContent = msg || '';
+  backupStatus.style.color = isError ? 'var(--danger, #d93025)' : 'var(--text-secondary, #70757a)';
+}
+
+// Export every saved memo to a single JSON backup file
+function exportAllMemos() {
+  chrome.storage.local.get(['savedMemos'], (result) => {
+    const savedMemos = result.savedMemos || [];
+    if (savedMemos.length === 0) {
+      setBackupStatus('No saved memos to export yet.', true);
+      return;
+    }
+    const payload = {
+      app: 'Simple Side Note',
+      type: 'backup',
+      version: chrome.runtime.getManifest().version,
+      exportedAt: new Date().toISOString(),
+      memos: savedMemos
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json; charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const d = new Date();
+    const stamp = d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'simple-side-note-backup-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setBackupStatus('✓ Exported ' + savedMemos.length + ' memo' + (savedMemos.length === 1 ? '' : 's') + '.');
+  });
+}
+
+// Coerce one raw entry from a backup file into a valid memo (or null to skip)
+function normalizeImportedMemo(raw, fallbackId) {
+  if (!raw || typeof raw !== 'object') return null;
+  const content = typeof raw.content === 'string' ? raw.content : '';
+  if (!content && !(typeof raw.title === 'string' && raw.title.trim())) return null; // empty junk
+  const title = (typeof raw.title === 'string' && raw.title.trim())
+    ? raw.title
+    : (stripHtml(content).split('\n')[0] || 'Untitled').substring(0, 50);
+  return {
+    id: typeof raw.id === 'number' ? raw.id : fallbackId,
+    title: title,
+    content: content,
+    date: typeof raw.date === 'string' ? raw.date : new Date().toLocaleString(),
+    pinned: !!raw.pinned
+  };
+}
+
+// Merge a backup file into the existing memos. Never deletes; skips exact
+// duplicates (same title + content) so re-importing is safe.
+function importMemosFromFile(file) {
+  const reader = new FileReader();
+  reader.onerror = () => setBackupStatus('⚠ Could not read the file.', true);
+  reader.onload = (e) => {
+    let data;
+    try {
+      data = JSON.parse(e.target.result);
+    } catch (err) {
+      setBackupStatus('⚠ Could not import — the file is not valid JSON.', true);
+      return;
+    }
+    const rawMemos = Array.isArray(data)
+      ? data
+      : (data && Array.isArray(data.memos) ? data.memos : null);
+    if (!rawMemos) {
+      setBackupStatus('⚠ This file is not a Simple Side Note backup.', true);
+      return;
+    }
+
+    chrome.storage.local.get(['savedMemos'], (result) => {
+      const existing = result.savedMemos || [];
+      const existingIds = new Set(existing.map(m => m.id));
+      const existingKeys = new Set(existing.map(m => (m.title || '') + '::' + m.content));
+
+      const idBase = Date.now();
+      const toAdd = [];
+      rawMemos.forEach((raw, i) => {
+        const memo = normalizeImportedMemo(raw, idBase + i);
+        if (!memo) return;
+        const key = (memo.title || '') + '::' + memo.content;
+        if (existingKeys.has(key)) return;        // already have this exact memo
+        existingKeys.add(key);
+        if (existingIds.has(memo.id)) memo.id = idBase + i; // keep ids unique
+        existingIds.add(memo.id);
+        toAdd.push(memo);
+      });
+
+      if (toAdd.length === 0) {
+        setBackupStatus('Nothing new to import — those memos are already here.');
+        return;
+      }
+
+      const merged = toAdd.concat(existing);
+      chrome.storage.local.set({ savedMemos: merged }, () => {
+        if (chrome.runtime.lastError) {
+          setBackupStatus('⚠ Import failed: ' + chrome.runtime.lastError.message, true);
+          return;
+        }
+        setBackupStatus('✓ Imported ' + toAdd.length + ' memo' + (toAdd.length === 1 ? '' : 's') + '.');
+        renderSavedList();
+      });
+    });
+  };
+  reader.readAsText(file);
+}
+
+if (exportAllBtn) exportAllBtn.addEventListener('click', exportAllMemos);
+if (importBtn && importFile) {
+  importBtn.addEventListener('click', () => importFile.click());
+  importFile.addEventListener('change', () => {
+    const file = importFile.files && importFile.files[0];
+    if (file) importMemosFromFile(file);
+    importFile.value = ''; // let the user re-select the same file later
+  });
 }
 
 // ===== Custom themed confirm dialog =====
