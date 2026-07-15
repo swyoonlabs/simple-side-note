@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simple Side Note v1.2.0 업데이트</title>
+</head>
+<body>
+
+<!-- ============================================================= -->
+<!-- Blogger에 붙여넣을 때는 아래 <style>부터 </div>(맨 끝)까지 복사하세요 -->
+<!-- ============================================================= -->
+
+<style>
+.ssn-post {
+  --ssn-accent: #1a73e8;
+  --ssn-accent-hover: #1557b0;
+  --ssn-text: #202124;
+  --ssn-muted: #5f6368;
+  --ssn-border: #e3e6ea;
+  --ssn-surface: #f8f9fc;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 8px 4px 40px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color: var(--ssn-text);
+  line-height: 1.7;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+.ssn-post * { box-sizing: border-box; }
+.ssn-post .ssn-hero {
+  text-align: center;
+  padding: 32px 20px 28px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1a73e8 0%, #4f9bff 100%);
+  color: #fff;
+  margin-bottom: 28px;
+}
+.ssn-post .ssn-badge {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  background: rgba(255,255,255,0.22);
+  padding: 5px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+.ssn-post .ssn-hero h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #fff;
+}
+.ssn-post .ssn-hero p {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+.ssn-post h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 40px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--ssn-border);
+}
+.ssn-post h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin: 22px 0 8px;
+}
+.ssn-post p { margin: 0 0 14px; }
+.ssn-post strong { font-weight: 700; }
+.ssn-post table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 20px;
+  font-size: 15px;
+}
+.ssn-post th, .ssn-post td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ssn-border);
+  vertical-align: top;
+}
+.ssn-post th {
+  background: var(--ssn-surface);
+  font-weight: 600;
+}
+.ssn-post kbd {
+  display: inline-block;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fff;
+  border: 1px solid #c7cdd4;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 2px 8px;
+  color: var(--ssn-text);
+  white-space: nowrap;
+}
+.ssn-post .ssn-card {
+  border: 1px solid var(--ssn-border);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin: 18px 0;
+  background: #fff;
+}
+.ssn-post .ssn-card.ssn-star {
+  border-color: #bcd7ff;
+  background: #f4f9ff;
+}
+.ssn-post .ssn-tip {
+  background: #fff8e1;
+  border: 1px solid #ffe08a;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 16px 0;
+  font-size: 15px;
+}
+.ssn-post ul { margin: 0 0 14px; padding-left: 22px; }
+.ssn-post li { margin: 6px 0; }
+.ssn-post .ssn-summary li { margin: 10px 0; }
+.ssn-post .ssn-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 8px;
+}
+.ssn-post .ssn-cta a {
+  flex: 1 1 auto;
+  text-align: center;
+  text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.ssn-post .ssn-cta a.ssn-primary { background: var(--ssn-accent); color: #fff; }
+.ssn-post .ssn-cta a.ssn-primary:hover { background: var(--ssn-accent-hover); }
+.ssn-post .ssn-cta a.ssn-ghost {
+  background: var(--ssn-surface);
+  color: var(--ssn-text);
+  border: 1px solid var(--ssn-border);
+}
+.ssn-post .ssn-meta {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ssn-border);
+  font-size: 14px;
+  color: var(--ssn-muted);
+}
+.ssn-post .ssn-shot {
+  border: 1px dashed #c7cdd4;
+  border-radius: 12px;
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--ssn-muted);
+  font-size: 14px;
+  background: var(--ssn-surface);
+  margin: 14px 0;
+}
+</style>
+
+<div class="ssn-post">
+
+  <div class="ssn-hero">
+    <span class="ssn-badge">UPDATE · v1.2.0</span>
+    <h1>이제 메모를 잃어버릴 걱정 없이</h1>
+    <p>브라우저 사이드바 메모장 <strong>Simple Side Note</strong>의 1.2.0 업데이트<br>— 데이터를 지키고, 손은 덜 쓰게.</p>
+  </div>
+
+  <h2>📝 한눈에 보기</h2>
+  <table>
+    <tr><th>변경</th><th>내용</th></tr>
+    <tr><td>💾 <strong>백업 &amp; 복원</strong></td><td>모든 메모를 JSON 파일 하나로 내보내고, 언제든 다시 불러오기</td></tr>
+    <tr><td>⌨️ <strong>키보드 단축키</strong></td><td><kbd>⌘/Ctrl + S</kbd> 저장, <kbd>⌘/Ctrl + F</kbd> 검색 — 설정에서 켜고 끄기</td></tr>
+    <tr><td>🖥️ <strong>OS 시스템 폰트</strong></td><td>Mac은 SF, Windows는 Segoe UI로 자동 적용</td></tr>
+    <tr><td>🐛 <strong>자잘한 수정</strong></td><td>색상 버튼 툴팁 언어 통일 등</td></tr>
+  </table>
+
+  <h2>💾 백업 &amp; 복원 — 이번 업데이트의 주인공</h2>
+  <div class="ssn-card ssn-star">
+    <p>메모가 쌓일수록 커지는 걱정이 하나 있죠. <strong>“이거 날아가면 어떡하지?”</strong></p>
+    <p>기존에는 메모를 하나씩 HTML·Markdown으로 내보낼 수는 있어도 <strong>전체를 한 번에 백업할 방법이 없었습니다.</strong> 확장을 실수로 삭제하거나 PC를 바꾸면 그동안 쌓은 메모가 사라질 수 있었어요.</p>
+    <p>1.2.0부터는 <strong>⚙️ Settings 탭 → Backup &amp; Restore</strong>에서 두 버튼으로 해결됩니다.</p>
+    <ul>
+      <li><strong>📤 Export all</strong> — 저장된 모든 메모(제목·내용·핀·날짜)를 날짜가 붙은 JSON 파일로 내려받습니다. 예: <code>simple-side-note-backup-2026-07-10.json</code></li>
+      <li><strong>📥 Import</strong> — 백업 파일을 불러와 지금 메모에 <strong>합칩니다.</strong></li>
+    </ul>
+  </div>
+
+  <div class="ssn-shot">🖼️ (스크린샷 자리) Settings 탭의 Backup &amp; Restore 섹션</div>
+
+  <h3>안심하고 써도 되는 이유</h3>
+  <p>가져오기(Import)는 <strong>절대 기존 메모를 지우지 않습니다.</strong> 오직 추가만 해요. 게다가:</p>
+  <ul>
+    <li><strong>같은 메모는 중복으로 안 들어갑니다.</strong> 같은 백업 파일을 두 번 불러와도 깔끔합니다.</li>
+    <li>메모 식별자가 겹치면 자동으로 새로 부여해 <strong>데이터가 꼬이지 않습니다.</strong></li>
+    <li>저장이 실패하면 <strong>조용히 넘어가지 않고 알려줍니다.</strong></li>
+  </ul>
+  <div class="ssn-tip">💡 <strong>팁</strong> — 중요한 메모가 쌓였다면, 가끔 <strong>Export all</strong> 한 번으로 백업 파일을 만들어 두세요. 그 파일만 있으면 어떤 상황에서도 <strong>Import</strong>로 되살릴 수 있습니다.</div>
+
+  <h2>⌨️ 키보드 단축키 — 마우스 없이 저장하고 검색하기</h2>
+  <div class="ssn-card">
+    <p>이제 손을 키보드에서 떼지 않고 메모를 다룰 수 있습니다.</p>
+    <table>
+      <tr><th>동작</th><th>macOS</th><th>Windows / Linux</th></tr>
+      <tr><td>저장</td><td><kbd>⌘ S</kbd></td><td><kbd>Ctrl + S</kbd></td></tr>
+      <tr><td>검색</td><td><kbd>⌘ F</kbd></td><td><kbd>Ctrl + F</kbd></td></tr>
+    </table>
+    <ul>
+      <li>운영체제에 맞춰 <strong>수식키가 자동으로 바뀝니다</strong> — Mac은 <kbd>⌘</kbd>, 그 외에는 <kbd>Ctrl</kbd>. 버튼에 마우스를 올리면 툴팁으로 확인할 수 있어요.</li>
+      <li><kbd>⌘/Ctrl + F</kbd>는 브라우저 기본 찾기 대신 <strong>저장된 메모 검색창으로 바로 이동</strong>합니다.</li>
+      <li>브라우저 기본 동작을 그대로 쓰고 싶다면? <strong>⚙️ Settings 탭에서 단축키를 끌 수 있습니다.</strong></li>
+    </ul>
+  </div>
+
+  <h2>🖥️ OS 시스템 폰트 — 어느 OS에서든 자연스럽게</h2>
+  <div class="ssn-card">
+    <p>메모장이 브라우저·운영체제와 겉도는 느낌이 나지 않도록, UI와 편집 영역이 <strong>각 OS의 기본 시스템 폰트</strong>를 쓰도록 바꿨습니다.</p>
+    <ul>
+      <li><strong>Mac</strong> → San Francisco</li>
+      <li><strong>Windows</strong> → Segoe UI</li>
+      <li><strong>Linux</strong> → Roboto 등</li>
+    </ul>
+    <p>별도 설정 없이 열기만 하면 지금 쓰는 OS에 가장 잘 어울리는 글꼴로 표시됩니다. 내보낸 HTML 파일과도 이제 글꼴 인상이 일치해요.</p>
+  </div>
+
+  <h2>🐛 자잘한 개선</h2>
+  <ul>
+    <li>폰트 색상 버튼(검정/빨강/파랑)의 툴팁이 한국어로만 표시되던 부분을 <strong>영어(Black / Red / Blue)로 통일</strong>해 UI 언어 일관성을 맞췄습니다.</li>
+  </ul>
+
+  <h2>📢 이번 업데이트, 이런 분께</h2>
+  <ul class="ssn-summary">
+    <li>✅ 메모가 사라질까 봐 불안했던 분 → <strong>백업 파일 하나로 끝</strong></li>
+    <li>✅ 마우스 클릭 없이 빠르게 저장·검색하고 싶은 분 → <strong>단축키</strong></li>
+    <li>✅ Mac과 Windows를 오가며 쓰는 분 → <strong>OS별 폰트로 어디서나 자연스럽게</strong></li>
+  </ul>
+
+  <div class="ssn-cta">
+    <a class="ssn-primary" href="https://chromewebstore.google.com/detail/simple-side-note/nfbfojjmjdhoebicleopmalefcbabonl?hl=ko&utm_source=ext_sidebar" target="_blank" rel="noopener">🛒 Chrome Web Store에서 설치</a>
+    <a class="ssn-ghost" href="https://github.com/orgs/swyoonlabs/repositories" target="_blank" rel="noopener">🔗 GitHub</a>
+  </div>
+
+  <div class="ssn-meta">
+    <strong>Released</strong> 2026-07-10 · <strong>Version</strong> 1.2.0 · <strong>Status</strong> ✅ Stable<br>
+    Made with ☕ by swyoonlabs
+  </div>
+
+</div>
+<!-- ======================= 복사 끝 ======================= -->
+
+</body>
+</html>

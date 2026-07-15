@@ -1,0 +1,135 @@
+<!-- Blogspot: "HTML 보기"에 그대로 붙여넣으세요. 이미지는 GitHub(raw)에서 불러옵니다. -->
+<div style="max-width:720px;margin:0 auto;font-family:'Segoe UI','Malgun Gothic',sans-serif;line-height:1.75;color:#1e293b;">
+
+  <p style="text-align:center;margin:0 0 8px;font-size:14px;font-weight:700;letter-spacing:1px;color:#d97706;">UPDATE · v1.2.0</p>
+
+  <h1 style="text-align:center;font-size:30px;line-height:1.3;margin:0 0 20px;color:#0f172a;">
+    이제 메모를 잃어버릴 걱정 없이
+  </h1>
+
+  <p style="text-align:center;margin:0 0 24px;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-1-hero.png"
+         alt="Simple Side Note 1.2.0 — 브라우저 사이드바 메모장" style="width:100%;border-radius:16px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <p style="font-size:18px;">
+    브라우저 사이드바에 딱 붙어 있는 가벼운 메모장 <b>Simple Side Note</b>의 <b>1.2.0</b> 업데이트가 나왔습니다.
+    이번 버전을 한 문장으로 요약하면 — <b>"데이터는 지키고, 손은 덜 쓰게."</b>
+  </p>
+
+  <!-- 한눈에 보기 -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
+    <p style="margin:0 0 10px;font-weight:700;color:#0f172a;">📝 한눈에 보기</p>
+    <ul style="margin:0;padding-left:20px;">
+      <li>💾 <b>백업 &amp; 복원</b> — 모든 메모를 파일 하나로 내보내고 언제든 다시 불러오기</li>
+      <li>⌨️ <b>키보드 단축키</b> — <code>⌘/Ctrl+S</code> 저장, <code>⌘/Ctrl+F</code> 검색 (설정에서 On/Off)</li>
+      <li>🖥️ <b>OS 시스템 폰트</b> — Mac은 SF, Windows는 Segoe UI로 자동 적용</li>
+      <li>🐛 <b>자잘한 수정</b> — 색상 버튼 툴팁 언어 통일 등</li>
+    </ul>
+  </div>
+
+  <!-- 1. 백업 & 복원 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">💾 백업 &amp; 복원 — 이번 업데이트의 주인공</h2>
+  <p>
+    메모가 쌓일수록 커지는 걱정이 하나 있죠. <b>"이거 날아가면 어떡하지?"</b>
+    기존에는 메모를 하나씩 HTML·Markdown으로 내보낼 수는 있어도, <b>전체를 한 번에 백업할 방법이 없었습니다.</b>
+    확장을 실수로 삭제하거나 PC를 바꾸면 그동안 쌓은 메모가 사라질 수 있었어요.
+  </p>
+  <p>
+    1.2.0부터는 <b>⚙️ Settings 탭 → Backup &amp; Restore</b> 에서 두 버튼으로 해결됩니다.
+  </p>
+  <ul>
+    <li><b>📤 Export all</b> — 저장된 모든 메모(제목·내용·핀·날짜)를 날짜가 붙은 파일 하나로 내려받습니다. 예: <code>simple-side-note-backup-2026-07-10.json</code></li>
+    <li><b>📥 Import</b> — 백업 파일을 불러와 지금 메모에 <b>합칩니다.</b></li>
+  </ul>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-4-export.png"
+         alt="메모 내보내기 & 백업" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <h3 style="font-size:19px;margin:28px 0 10px;color:#0f172a;">안심하고 써도 되는 이유</h3>
+  <p>가져오기(Import)는 <b>절대 기존 메모를 지우지 않습니다.</b> 오직 추가만 해요. 게다가:</p>
+  <ul>
+    <li><b>같은 메모는 중복으로 안 들어갑니다.</b> 같은 백업 파일을 두 번 불러와도 깔끔해요.</li>
+    <li>내부적으로 메모 식별자가 겹치면 자동으로 새로 부여해 <b>데이터가 꼬이지 않습니다.</b></li>
+    <li>저장 공간이 부족한 경우처럼 저장이 실패하면 <b>조용히 넘어가지 않고 알려줍니다.</b></li>
+  </ul>
+
+  <div style="background:#fffbeb;border-left:4px solid #f5c518;border-radius:0 10px 10px 0;padding:14px 18px;margin:22px 0;">
+    💡 <b>팁:</b> 중요한 메모가 쌓였다면, 가끔 <b>Export all</b> 한 번으로 백업 파일을 만들어 두세요.
+    그 파일만 있으면 어떤 상황에서도 <b>Import</b>로 되살릴 수 있습니다.
+  </div>
+
+  <!-- 2. 키보드 단축키 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">⌨️ 키보드 단축키 — 마우스 없이 저장하고 검색하기</h2>
+  <p>이제 손을 키보드에서 떼지 않고 메모를 다룰 수 있습니다.</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;">
+    <thead>
+      <tr style="background:#f1f5f9;">
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">동작</th>
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">macOS</th>
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">Windows / Linux</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:10px 14px;border:1px solid #e2e8f0;">저장</td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>⌘ S</code></td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>Ctrl + S</code></td></tr>
+      <tr><td style="padding:10px 14px;border:1px solid #e2e8f0;">검색</td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>⌘ F</code></td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>Ctrl + F</code></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>운영체제에 맞춰 <b>수식키가 자동으로 바뀝니다</b> — Mac에서는 <code>⌘</code>, 그 외에는 <code>Ctrl</code>. 버튼에 마우스를 올리면 툴팁으로 확인할 수 있어요.</li>
+    <li><code>⌘/Ctrl+F</code>는 브라우저 기본 찾기 대신 <b>저장된 메모 검색창으로 바로 이동</b>합니다.</li>
+    <li>브라우저 기본 동작을 그대로 쓰고 싶다면? <b>⚙️ Settings 탭에서 단축키를 끌 수 있습니다.</b></li>
+  </ul>
+
+  <!-- 3. OS 시스템 폰트 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🖥️ OS 시스템 폰트 — 어느 OS에서든 자연스럽게</h2>
+  <p>
+    메모장이 브라우저·운영체제와 겉도는 느낌이 나지 않도록, UI와 편집 영역이 <b>각 OS의 기본 시스템 폰트</b>를 쓰도록 바꿨습니다.
+  </p>
+  <ul>
+    <li><b>Mac</b> → San Francisco (<code>-apple-system</code>)</li>
+    <li><b>Windows</b> → Segoe UI</li>
+    <li><b>Linux</b> → Roboto 등</li>
+  </ul>
+  <p>
+    별도 설정 없이 열기만 하면 지금 쓰는 OS에 가장 잘 어울리는 글꼴로 표시됩니다. 내보낸 HTML 파일과도 이제 글꼴 인상이 일치해요.
+  </p>
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-5-themes.png"
+         alt="Light · Dark · Warm 테마" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <!-- 자잘한 개선 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🐛 자잘한 개선</h2>
+  <ul>
+    <li>폰트 색상 버튼(검정/빨강/파랑)의 툴팁이 한국어로만 표시되던 부분을 <b>영어(Black / Red / Blue)로 통일</b>해 UI 전체의 언어 일관성을 맞췄습니다.</li>
+  </ul>
+
+  <!-- 이런 분께 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">📢 이번 업데이트, 이런 분께</h2>
+  <ul>
+    <li>✅ 메모가 사라질까 봐 불안했던 분 → <b>백업 파일 하나로 끝</b></li>
+    <li>✅ 마우스 클릭 없이 빠르게 저장·검색하고 싶은 분 → <b>단축키</b></li>
+    <li>✅ Mac과 Windows를 오가며 쓰는 분 → <b>OS별 폰트로 어디서나 자연스럽게</b></li>
+  </ul>
+
+  <!-- 설치 & 업데이트 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">설치 &amp; 업데이트</h2>
+  <ul>
+    <li>🛒 Chrome 웹스토어: <a href="https://chromewebstore.google.com/detail/simple-side-note/nfbfojjmjdhoebicleopmalefcbabonl?hl=ko">Simple Side Note 설치하기</a></li>
+    <li>💻 GitHub: <a href="https://github.com/swyoonlabs/simple-side-note">github.com/swyoonlabs/simple-side-note</a></li>
+    <li>🌐 개발자 블로그: <a href="https://swyoonlabs.blogspot.com/">swyoonlabs.blogspot.com</a></li>
+  </ul>
+  <p>
+    이미 설치해 쓰고 계셨다면, 웹스토어가 <b>자동으로 최신 버전으로 업데이트</b>합니다.
+    소스로 설치했다면 최신 버전을 받아 <code>chrome://extensions/</code>에서 <b>새로고침</b>하면 1.2.0이 적용됩니다.
+  </p>
+
+  <p style="margin-top:28px;color:#64748b;font-size:15px;">
+    Simple Side Note는 모든 메모를 <b>여러분의 기기에만</b> 저장합니다. 서버로 보내는 데이터는 없어요.
+    이제 백업까지 있으니, 소중한 메모는 온전히 여러분 손안에 있습니다. 📝
+  </p>
+
+</div>

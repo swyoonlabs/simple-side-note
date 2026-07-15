@@ -1,0 +1,135 @@
+<!-- Blogspot: paste directly into "HTML view". Images load from GitHub (raw). -->
+<div style="max-width:720px;margin:0 auto;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.75;color:#1e293b;">
+
+  <p style="text-align:center;margin:0 0 8px;font-size:14px;font-weight:700;letter-spacing:1px;color:#d97706;">UPDATE · v1.2.0</p>
+
+  <h1 style="text-align:center;font-size:30px;line-height:1.3;margin:0 0 20px;color:#0f172a;">
+    Never lose a note again
+  </h1>
+
+  <p style="text-align:center;margin:0 0 24px;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-1-hero.png"
+         alt="Simple Side Note 1.2.0 — a notepad in your browser sidebar" style="width:100%;border-radius:16px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <p style="font-size:18px;">
+    <b>Simple Side Note</b> — the lightweight notepad that lives right in your browser sidebar — is now on <b>v1.2.0</b>.
+    In one line, this release is all about <b>"keep your data safe, and keep your hands on the keyboard."</b>
+  </p>
+
+  <!-- At a glance -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
+    <p style="margin:0 0 10px;font-weight:700;color:#0f172a;">📝 At a glance</p>
+    <ul style="margin:0;padding-left:20px;">
+      <li>💾 <b>Backup &amp; Restore</b> — export all your notes to a single file and import them back anytime</li>
+      <li>⌨️ <b>Keyboard shortcuts</b> — <code>⌘/Ctrl+S</code> to save, <code>⌘/Ctrl+F</code> to search (toggle in Settings)</li>
+      <li>🖥️ <b>OS system fonts</b> — San Francisco on Mac, Segoe UI on Windows, applied automatically</li>
+      <li>🐛 <b>Small fixes</b> — unified color-button tooltip language, and more</li>
+    </ul>
+  </div>
+
+  <!-- 1. Backup & Restore -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">💾 Backup &amp; Restore — the star of this release</h2>
+  <p>
+    As your notes pile up, one worry grows with them: <b>"What if I lose all of this?"</b>
+    Until now you could export notes one at a time as HTML or Markdown, but there was <b>no way to back up everything at once.</b>
+    Delete the extension by accident or switch computers, and the notes you'd collected could be gone.
+  </p>
+  <p>
+    Starting with 1.2.0, two buttons in <b>⚙️ Settings → Backup &amp; Restore</b> take care of it.
+  </p>
+  <ul>
+    <li><b>📤 Export all</b> — download every saved note (title, content, pin, date) as a single dated file, e.g. <code>simple-side-note-backup-2026-07-10.json</code></li>
+    <li><b>📥 Import</b> — load a backup file and <b>merge</b> it into your current notes</li>
+  </ul>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-4-export.png"
+         alt="Exporting and backing up notes" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <h3 style="font-size:19px;margin:28px 0 10px;color:#0f172a;">Why it's safe to use</h3>
+  <p>Import <b>never deletes your existing notes.</b> It only adds. On top of that:</p>
+  <ul>
+    <li><b>Duplicates are skipped.</b> Import the same backup file twice and your list stays clean.</li>
+    <li>If note identifiers collide internally, new ones are assigned automatically, so <b>your data never gets tangled.</b></li>
+    <li>If a save fails — for example when storage is full — it <b>tells you instead of silently dropping the note.</b></li>
+  </ul>
+
+  <div style="background:#fffbeb;border-left:4px solid #f5c518;border-radius:0 10px 10px 0;padding:14px 18px;margin:22px 0;">
+    💡 <b>Tip:</b> Once you've collected notes that matter, run <b>Export all</b> now and then to create a backup file.
+    With that one file, you can always bring everything back with <b>Import</b>.
+  </div>
+
+  <!-- 2. Keyboard shortcuts -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">⌨️ Keyboard shortcuts — save and search without the mouse</h2>
+  <p>You can now work with your notes without lifting your hands off the keyboard.</p>
+  <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px;">
+    <thead>
+      <tr style="background:#f1f5f9;">
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">Action</th>
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">macOS</th>
+        <th style="text-align:left;padding:10px 14px;border:1px solid #e2e8f0;">Windows / Linux</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:10px 14px;border:1px solid #e2e8f0;">Save</td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>⌘ S</code></td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>Ctrl + S</code></td></tr>
+      <tr><td style="padding:10px 14px;border:1px solid #e2e8f0;">Search</td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>⌘ F</code></td><td style="padding:10px 14px;border:1px solid #e2e8f0;"><code>Ctrl + F</code></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>The modifier key <b>adapts to your OS</b> — <code>⌘</code> on Mac, <code>Ctrl</code> everywhere else. Hover a button to see its shortcut in the tooltip.</li>
+    <li><code>⌘/Ctrl+F</code> jumps <b>straight to the saved-notes search box</b> instead of the browser's built-in find.</li>
+    <li>Prefer the browser's default behavior? <b>You can turn the shortcuts off in the ⚙️ Settings tab.</b></li>
+  </ul>
+
+  <!-- 3. OS system fonts -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🖥️ OS system fonts — natural on every platform</h2>
+  <p>
+    So the notepad no longer feels out of place next to your browser and OS, the UI and editor now use <b>each platform's native system font.</b>
+  </p>
+  <ul>
+    <li><b>Mac</b> → San Francisco (<code>-apple-system</code>)</li>
+    <li><b>Windows</b> → Segoe UI</li>
+    <li><b>Linux</b> → Roboto, etc.</li>
+  </ul>
+  <p>
+    No setup needed — just open it, and your notes render in the typeface that fits your current OS best. Your exported HTML files now match that look, too.
+  </p>
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-5-themes.png"
+         alt="Light · Dark · Warm themes" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <!-- Small fixes -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🐛 Small improvements</h2>
+  <ul>
+    <li>The font-color buttons (black / red / blue) had Korean-only tooltips; they're now <b>unified to English (Black / Red / Blue)</b> for consistent UI language throughout.</li>
+  </ul>
+
+  <!-- Who it's for -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">📢 This update is for you if…</h2>
+  <ul>
+    <li>✅ You've worried about losing your notes → <b>one backup file has you covered</b></li>
+    <li>✅ You want to save and search fast without clicking → <b>keyboard shortcuts</b></li>
+    <li>✅ You move between Mac and Windows → <b>native fonts that feel right everywhere</b></li>
+  </ul>
+
+  <!-- Install & update -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">Install &amp; update</h2>
+  <ul>
+    <li>🛒 Chrome Web Store: <a href="https://chromewebstore.google.com/detail/simple-side-note/nfbfojjmjdhoebicleopmalefcbabonl">Install Simple Side Note</a></li>
+    <li>💻 GitHub: <a href="https://github.com/swyoonlabs/simple-side-note">github.com/swyoonlabs/simple-side-note</a></li>
+    <li>🌐 Developer blog: <a href="https://swyoonlabs.blogspot.com/">swyoonlabs.blogspot.com</a></li>
+  </ul>
+  <p>
+    Already installed? The Web Store <b>updates you to the latest version automatically.</b>
+    If you installed from source, grab the latest build and hit <b>Reload</b> on <code>chrome://extensions/</code> to get 1.2.0.
+  </p>
+
+  <p style="margin-top:28px;color:#64748b;font-size:15px;">
+    Simple Side Note keeps every note <b>on your device only</b> — nothing is ever sent to a server.
+    And now, with Backup, your notes stay entirely in your own hands. 📝
+  </p>
+
+</div>

@@ -20,6 +20,9 @@ node_modules/
 dist/
 build/
 
+# Store upload package (regenerate as needed)
+*.zip
+
 # Environment files
 .env
 .env.local
