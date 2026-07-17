@@ -1,4 +1,4 @@
-# Chrome Web Store Listing — Simple Side Note (v1.2.0)
+# Chrome Web Store Listing — Simple Side Note (v1.3.0)
 
 > Copy the section below into the Chrome Web Store "Description" field.
 
@@ -14,6 +14,7 @@ Simple Side Note lives in your browser sidebar — so you can take notes without
 • ⚡ Instant Sidebar Notes — Open with one click and start writing. Save your note anytime with a single button — or just press ⌘/Ctrl+S.
 • 🖱️ Capture from Any Page — Select any text → Right-click → "Add to Memo". Perfect for saving AI-generated definitions and example sentences (with the source link, optional).
 • 💾 Save & Organize — Give each note a title, then search (⌘/Ctrl+F), sort, and 📌 pin your favorites to the top. Build your personal vocabulary list or study journal with ease.
+• 🧹 Auto-clean & Trash — Let old, unpinned notes tidy themselves after 7, 30, or 90 days (off by default). Deleted notes move to Trash and stay recoverable for 30 days, so nothing is lost by accident. Pin 📌 anything you want to keep forever.
 • 🗄️ Backup & Restore — Export all your notes to a single file and import them back anytime. Switching computers or reinstalling? Your vocabulary list comes with you — nothing gets left behind.
 • ⌨️ Keyboard Shortcuts — Save and search without touching the mouse. Shortcuts match your OS (⌘ on Mac, Ctrl on Windows) and can be turned off in Settings.
 • 🖼️ Rich Notes — Paste images, adjust font size, and add color to highlight key points.
@@ -39,9 +40,9 @@ Start studying smarter. Install Simple Side Note and keep your notes right besid
 
 ---
 
-## What's new in v1.2.0 (short blurb for the update notice)
+## What's new in v1.3.0 (short blurb for the update notice)
 
-New in 1.2.0:
-• 🗄️ Full Backup & Restore — export/import all your notes as a single file
-• ⌨️ Keyboard shortcuts — ⌘/Ctrl+S to save, ⌘/Ctrl+F to search (toggle in Settings)
-• 🖥️ OS-native system fonts for a more natural look on Mac and Windows
+New in 1.3.0:
+• 🧹 Auto-clean old memos — unpinned notes older than 7/30/90 days clear themselves (off by default)
+• 🗑️ Trash — deleted notes go to Trash and stay recoverable for 30 days
+• 📌 Pin = keep — pinned notes are never auto-cleaned, so your keepers are safe
