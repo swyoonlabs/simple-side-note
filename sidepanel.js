@@ -17,6 +17,19 @@ const importBtn = document.getElementById('importBtn');
 const importFile = document.getElementById('importFile');
 const backupStatus = document.getElementById('backupStatus');
 
+// Trash (recently deleted) elements
+const trashSection = document.getElementById('trashSection');
+const trashToggle = document.getElementById('trashToggle');
+const trashHeaderLabel = document.getElementById('trashHeaderLabel');
+const trashCaret = document.getElementById('trashCaret');
+const trashBody = document.getElementById('trashBody');
+const trashList = document.getElementById('trashList');
+const emptyTrashBtn = document.getElementById('emptyTrashBtn');
+
+// How long deleted memos stay recoverable in Trash before being purged.
+const TRASH_RETENTION_DAYS = 30;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 // Confirm dialog elements
 const confirmOverlay = document.getElementById('confirmOverlay');
 const confirmMessage = document.getElementById('confirmMessage');
@@ -29,7 +42,8 @@ const DEFAULT_SETTINGS = {
   warnUnsaved: true,         // confirm before discarding unsaved changes
   confirmDelete: true,       // confirm before deleting a saved memo
   captureUrl: false,         // append source URL when using "Add to Memo"
-  keyboardShortcuts: true    // enable ⌘/Ctrl+S save & ⌘/Ctrl+F search shortcuts
+  keyboardShortcuts: true,   // enable ⌘/Ctrl+S save & ⌘/Ctrl+F search shortcuts
+  autoCleanupDays: 0         // auto-delete unpinned memos older than N days (0 = off)
 };
 let settings = Object.assign({}, DEFAULT_SETTINGS);
 
@@ -40,6 +54,9 @@ const settingControls = {
   captureUrl: document.getElementById('setCaptureUrl'),
   keyboardShortcuts: document.getElementById('setKeyboardShortcuts')
 };
+
+// Auto-cleanup is a <select>, not a checkbox, so it's wired separately below.
+const autoCleanupSelect = document.getElementById('setAutoCleanup');
 
 chrome.storage.local.get(['settings'], (result) => {
   settings = Object.assign({}, DEFAULT_SETTINGS, result.settings || {});
@@ -54,6 +71,20 @@ chrome.storage.local.get(['settings'], (result) => {
     });
   });
   updateShortcutLabels();
+
+  if (autoCleanupSelect) {
+    autoCleanupSelect.value = String(settings.autoCleanupDays || 0);
+    autoCleanupSelect.addEventListener('change', () => {
+      settings.autoCleanupDays = Number(autoCleanupSelect.value) || 0;
+      chrome.storage.local.set({ settings: settings });
+      // Apply immediately so the user sees the effect right after choosing.
+      runAutoCleanup(renderSavedList);
+    });
+  }
+
+  // Once per panel open, after settings are known: purge long-dead trash,
+  // then move newly-expired memos into the trash.
+  purgeExpiredTrash(() => runAutoCleanup());
 });
 
 // Initialize search UI - hide clear button initially
@@ -178,7 +209,8 @@ document.querySelectorAll('.tab-item').forEach(tab => {
     tab.classList.add('active');
     document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
     if (tab.dataset.tab === 'saved') {
-      renderSavedList();
+      // Purge long-dead trash, sweep expired memos into trash, then show the list
+      purgeExpiredTrash(() => runAutoCleanup(renderSavedList));
     }
   });
 });
@@ -365,18 +397,21 @@ function saveCurrentMemo(callback) {
       ? savedMemos.findIndex(m => m.id === currentMemoId)
       : -1;
 
+    const now = Date.now();
     if (index !== -1) {
       savedMemos[index].title = title;
       savedMemos[index].content = htmlContent;
       savedMemos[index].date = new Date().toLocaleString();
+      savedMemos[index].updatedAt = now; // last-touched time drives auto-cleanup age
     } else {
       // New memo, or the tracked memo no longer exists (e.g. was deleted)
       const savedMemo = {
-        id: Date.now(),
+        id: now,
         title: title,
         content: htmlContent,
         date: new Date().toLocaleString(),
-        pinned: false
+        pinned: false,
+        updatedAt: now
       };
       currentMemoId = savedMemo.id;
       savedMemos.unshift(savedMemo);
@@ -482,13 +517,16 @@ function renderSavedList() {
           deleteSavedMemo(memo.id);
           return;
         }
-        showConfirm('Delete this saved memo?', 'Delete').then((ok) => {
+        showConfirm('Move this memo to Trash? You can restore it for 30 days.', 'Delete').then((ok) => {
           if (ok) deleteSavedMemo(memo.id);
         });
       });
 
       savedList.appendChild(li);
     });
+
+    // Keep the Trash panel below the list in sync
+    renderTrash();
   });
 }
 
@@ -523,11 +561,18 @@ function togglePin(id) {
   });
 }
 
-// ===== 7. Delete a saved memo =====
+// ===== 7. Delete a saved memo (moves it to Trash, not gone forever) =====
 function deleteSavedMemo(id) {
-  chrome.storage.local.get(['savedMemos'], (result) => {
-    const savedMemos = (result.savedMemos || []).filter(m => m.id !== id);
-    chrome.storage.local.set({ savedMemos: savedMemos }, () => {
+  chrome.storage.local.get(['savedMemos', 'trashedMemos'], (result) => {
+    const savedMemos = result.savedMemos || [];
+    const trashedMemos = result.trashedMemos || [];
+    const memo = savedMemos.find(m => m.id === id);
+    const remaining = savedMemos.filter(m => m.id !== id);
+    // Keep a copy in Trash so an accidental delete can be undone.
+    const newTrash = memo
+      ? [Object.assign({}, memo, { trashedAt: Date.now() })].concat(trashedMemos)
+      : trashedMemos;
+    chrome.storage.local.set({ savedMemos: remaining, trashedMemos: newTrash }, () => {
       // If the deleted memo was being edited, detach it so a later Save
       // creates a fresh entry instead of silently doing nothing.
       if (currentMemoId === id) {
@@ -535,6 +580,134 @@ function deleteSavedMemo(id) {
         chrome.storage.local.set({ currentMemoId: null });
       }
       renderSavedList();
+    });
+  });
+}
+
+// ===== 7b. Auto-cleanup of old memos =====
+// Deletes unpinned memos whose last-touched time is older than the configured
+// age. Pinned memos and the memo currently open in the editor are always kept,
+// so the user can rely on 📌 as "keep this" and never lose what they're viewing.
+function runAutoCleanup(callback) {
+  const days = Number(settings.autoCleanupDays) || 0;
+  if (!days) { if (callback) callback(); return; } // feature off
+  const cutoff = Date.now() - days * DAY_MS;
+
+  chrome.storage.local.get(['savedMemos', 'trashedMemos'], (result) => {
+    const savedMemos = result.savedMemos || [];
+    const trashedMemos = result.trashedMemos || [];
+    const now = Date.now();
+    const kept = [];
+    const expired = [];
+    savedMemos.forEach((m) => {
+      if (m.pinned || m.id === currentMemoId) { kept.push(m); return; } // never auto-remove
+      const ts = typeof m.updatedAt === 'number' ? m.updatedAt : m.id;   // fall back to creation time
+      if (ts >= cutoff) kept.push(m);                                    // recent enough to keep
+      else expired.push(Object.assign({}, m, { trashedAt: now }));       // → Trash, not gone
+    });
+
+    if (expired.length === 0) { if (callback) callback(); return; } // nothing expired
+
+    chrome.storage.local.set(
+      { savedMemos: kept, trashedMemos: expired.concat(trashedMemos) },
+      () => { if (callback) callback(); }
+    );
+  });
+}
+
+// ===== 7c. Trash: purge, restore, delete-forever, empty, render =====
+
+// Drop trashed memos older than the retention window (runs on panel/tab open).
+function purgeExpiredTrash(callback) {
+  const cutoff = Date.now() - TRASH_RETENTION_DAYS * DAY_MS;
+  chrome.storage.local.get(['trashedMemos'], (result) => {
+    const trashedMemos = result.trashedMemos || [];
+    const kept = trashedMemos.filter(m => (m.trashedAt || 0) >= cutoff);
+    if (kept.length === trashedMemos.length) { if (callback) callback(); return; }
+    chrome.storage.local.set({ trashedMemos: kept }, () => { if (callback) callback(); });
+  });
+}
+
+// Move a memo from Trash back into the saved list.
+function restoreFromTrash(id) {
+  chrome.storage.local.get(['savedMemos', 'trashedMemos'], (result) => {
+    const savedMemos = result.savedMemos || [];
+    const trashedMemos = result.trashedMemos || [];
+    const memo = trashedMemos.find(m => m.id === id);
+    if (!memo) return;
+    const newTrash = trashedMemos.filter(m => m.id !== id);
+    const restored = Object.assign({}, memo);
+    delete restored.trashedAt;
+    if (savedMemos.some(m => m.id === restored.id)) restored.id = Date.now(); // avoid id clash
+    savedMemos.unshift(restored);
+    chrome.storage.local.set({ savedMemos: savedMemos, trashedMemos: newTrash }, () => {
+      renderSavedList(); // also re-renders Trash
+    });
+  });
+}
+
+// Permanently remove a single memo from Trash.
+function deleteFromTrashForever(id) {
+  chrome.storage.local.get(['trashedMemos'], (result) => {
+    const trashedMemos = (result.trashedMemos || []).filter(m => m.id !== id);
+    chrome.storage.local.set({ trashedMemos: trashedMemos }, renderTrash);
+  });
+}
+
+// Render the Trash panel; hides itself when empty.
+function renderTrash() {
+  if (!trashSection || !trashList) return;
+  chrome.storage.local.get(['trashedMemos'], (result) => {
+    const trashedMemos = result.trashedMemos || [];
+    if (trashedMemos.length === 0) {
+      trashSection.style.display = 'none';
+      if (trashBody) trashBody.style.display = 'none';
+      if (trashCaret) trashCaret.textContent = '▸';
+      if (trashToggle) trashToggle.setAttribute('aria-expanded', 'false');
+      return;
+    }
+    trashSection.style.display = 'block';
+    if (trashHeaderLabel) trashHeaderLabel.textContent = '🗑️ Trash (' + trashedMemos.length + ')';
+
+    trashList.innerHTML = '';
+    trashedMemos
+      .slice()
+      .sort((a, b) => (b.trashedAt || 0) - (a.trashedAt || 0)) // most recently deleted first
+      .forEach((memo) => {
+        const li = document.createElement('li');
+        li.className = 'trash-item';
+        li.innerHTML =
+          '<div class="trash-item-title">' + escapeHtml(memo.title || 'Untitled') + '</div>' +
+          '<div class="trash-item-actions">' +
+            '<button class="trash-restore" title="Restore to saved memos">↩ Restore</button>' +
+            '<button class="trash-delete" title="Delete permanently">✕</button>' +
+          '</div>';
+        li.querySelector('.trash-restore').addEventListener('click', () => restoreFromTrash(memo.id));
+        li.querySelector('.trash-delete').addEventListener('click', () => {
+          showConfirm('Permanently delete this memo? This cannot be undone.', 'Delete').then((ok) => {
+            if (ok) deleteFromTrashForever(memo.id);
+          });
+        });
+        trashList.appendChild(li);
+      });
+  });
+}
+
+// Expand / collapse the Trash panel
+if (trashToggle && trashBody) {
+  trashToggle.addEventListener('click', () => {
+    const open = trashBody.style.display !== 'none';
+    trashBody.style.display = open ? 'none' : 'block';
+    if (trashCaret) trashCaret.textContent = open ? '▸' : '▾';
+    trashToggle.setAttribute('aria-expanded', String(!open));
+  });
+}
+
+// Empty the whole Trash at once
+if (emptyTrashBtn) {
+  emptyTrashBtn.addEventListener('click', () => {
+    showConfirm('Empty the Trash? Everything in it will be permanently deleted.', 'Empty trash').then((ok) => {
+      if (ok) chrome.storage.local.set({ trashedMemos: [] }, renderTrash);
     });
   });
 }

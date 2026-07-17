@@ -330,12 +330,91 @@
       cursor: pointer;
       outline: none;
     }
+    .setting-select {
+      padding: 6px 8px;
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 6px;
+      font-size: 12px;
+      background-color: var(--bg, #ffffff);
+      color: var(--text, #202124);
+      cursor: pointer;
+      outline: none;
+      flex-shrink: 0;
+    }
 
     /* Pinned item */
     .saved-item.pinned {
       border-left: 3px solid var(--accent, #1a73e8);
     }
     .saved-item-pin:hover { color: var(--accent, #1a73e8); }
+
+    /* Trash (recently deleted) */
+    .trash-section {
+      margin-top: 16px;
+      border-top: 1px solid var(--border, #dadce0);
+      padding-top: 4px;
+    }
+    .trash-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: none;
+      border: none;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary, #70757a);
+      cursor: pointer;
+    }
+    .trash-caret { font-size: 11px; }
+    .trash-note {
+      font-size: 11px;
+      color: var(--text-secondary, #70757a);
+      padding: 2px 4px 8px;
+      line-height: 1.4;
+    }
+    .trash-list { list-style: none; margin: 0; padding: 0; }
+    .trash-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--border, #dadce0);
+    }
+    .trash-item-title {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text, #202124);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .trash-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .trash-item-actions button {
+      background: none;
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text, #202124);
+      white-space: nowrap;
+    }
+    .trash-restore:hover { border-color: var(--accent, #1a73e8); color: var(--accent, #1a73e8); }
+    .trash-delete:hover { border-color: var(--danger, #d93025); color: var(--danger, #d93025); }
+    .trash-empty-btn {
+      margin: 10px 4px 4px;
+      background: none;
+      border: 1px solid var(--border, #dadce0);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--text-secondary, #70757a);
+    }
+    .trash-empty-btn:hover { border-color: var(--danger, #d93025); color: var(--danger, #d93025); }
 
     /* Settings tab */
     .settings-content { padding: 8px 4px; }
@@ -760,6 +839,19 @@
     <ul class="saved-list" id="savedList"></ul>
     <div class="empty-state" id="emptyState">No saved memos yet.</div>
     <div class="empty-state" id="noResults" style="display:none;">No matching memos found.</div>
+
+    <!-- Trash: recently deleted memos, kept as a safety net -->
+    <div class="trash-section" id="trashSection" style="display:none;">
+      <button class="trash-header" id="trashToggle" aria-expanded="false">
+        <span id="trashHeaderLabel">🗑️ Trash</span>
+        <span class="trash-caret" id="trashCaret">▸</span>
+      </button>
+      <div class="trash-body" id="trashBody" style="display:none;">
+        <div class="trash-note">Deleted memos stay here for 30 days, then they're removed for good.</div>
+        <ul class="trash-list" id="trashList"></ul>
+        <button class="trash-empty-btn" id="emptyTrashBtn">Empty trash now</button>
+      </div>
+    </div>
   </div>
 
   <!-- Tab: Settings -->
@@ -807,6 +899,18 @@
           <input type="checkbox" id="setConfirmDelete">
           <span class="slider"></span>
         </label>
+      </div>
+      <div class="setting-item">
+        <div class="setting-text">
+          <div class="setting-label">Auto-clean old memos</div>
+          <div class="setting-desc">Automatically move unpinned memos older than the chosen age to Trash each time you open the panel. Pinned (📌) memos are never removed — pin anything you want to keep. Trashed memos can still be restored for 30 days.</div>
+        </div>
+        <select id="setAutoCleanup" class="setting-select">
+          <option value="0">Off</option>
+          <option value="7">After 7 days</option>
+          <option value="30">After 30 days</option>
+          <option value="90">After 90 days</option>
+        </select>
       </div>
 
       <div class="about-section-title">Capture</div>

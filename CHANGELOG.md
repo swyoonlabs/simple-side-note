@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0] - 2026-07-17
+
+### New Features
+- **Auto-clean old memos** — New option in Settings → *Saved memos*. Choose to automatically move unpinned memos older than **7 / 30 / 90 days** to Trash; it runs each time you open the panel and when you open the Saved tab. Just keep jotting notes and let stale ones clear themselves — no more deleting one by one.
+  - **Pinned memos are never removed.** Pin (📌) anything you want to keep and it's exempt from cleanup — 📌 doubles as a "keep this" flag.
+  - **The memo you're currently editing is never removed**, even if it's old.
+  - **Off by default** — you opt in, so nothing is ever cleaned unless you choose an age.
+- **Trash (recently deleted)** — Deleting a memo (by hand or via auto-clean) now moves it to a **🗑️ Trash** panel at the bottom of the Saved tab instead of destroying it. Each item can be **↩ Restored** or deleted permanently, and there's an **Empty trash** button.
+  - Trashed memos are kept for **30 days**, then purged automatically — so accidental deletes are recoverable, but the trash never grows forever.
+- Memos now record an `updatedAt` timestamp so cleanup ages them by *last edited*, not just when they were first created. Older memos without the field fall back to their creation time.
+
+---
+
 ## [1.2.0] - 2026-07-10
 
 ### New Features
