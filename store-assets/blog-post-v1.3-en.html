@@ -1,0 +1,112 @@
+<!-- Blogspot: paste into "HTML view". Images load from GitHub (raw). -->
+<div style="max-width:720px;margin:0 auto;font-family:'Segoe UI','Malgun Gothic',sans-serif;line-height:1.75;color:#1e293b;">
+
+  <p style="text-align:center;margin:0 0 8px;font-size:14px;font-weight:700;letter-spacing:1px;color:#d97706;">UPDATE · v1.3.0</p>
+
+  <h1 style="text-align:center;font-size:30px;line-height:1.3;margin:0 0 20px;color:#0f172a;">
+    Just keep jotting — it tidies itself up
+  </h1>
+
+  <p style="text-align:center;margin:0 0 24px;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-1-hero.png"
+         alt="Simple Side Note 1.3.0 — a notepad in your browser sidebar" style="width:100%;border-radius:16px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <p style="font-size:18px;">
+    <b>Simple Side Note</b> — the lightweight notepad that lives in your browser sidebar — is out in <b>1.3.0</b>.
+    In one line: <b>"Less cleanup by hand, and every delete is undoable."</b>
+  </p>
+
+  <!-- At a glance -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
+    <p style="margin:0 0 10px;font-weight:700;color:#0f172a;">📝 At a glance</p>
+    <ul style="margin:0;padding-left:20px;">
+      <li>🧹 <b>Auto-clean old memos</b> — unpinned memos clear themselves after a chosen age (7 / 30 / 90 days)</li>
+      <li>🗑️ <b>Trash</b> — deleted memos are kept for <b>30 days</b> and can be restored anytime</li>
+      <li>📌 <b>Pin = "keep this"</b> — pinned memos are never auto-cleaned</li>
+      <li>🛡️ <b>Off by default</b> — nothing is removed until you opt in</li>
+    </ul>
+  </div>
+
+  <!-- 1. Auto-clean -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🧹 Auto-clean old memos — the headline feature</h2>
+  <p>
+    Every lightweight notepad has the same dilemma. It's great for <b>jotting things down the moment they pop up</b>,
+    but over time most of those turn into throwaway notes you no longer need — and deleting them one by one is
+    <b>quietly annoying</b>.
+  </p>
+  <p>
+    So 1.3.0 adds <b>⚙️ Settings → Saved memos → Auto-clean old memos</b>. Pick <b>7, 30, or 90 days</b> and any
+    <b>unpinned</b> memo older than that is <b>swept away automatically each time you open the panel</b>.
+    Just keep writing.
+  </p>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-7-autoclean.png"
+         alt="Settings — Auto-clean old memos" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);border:1px solid #e2e8f0;">
+  </p>
+
+  <h3 style="font-size:19px;margin:28px 0 10px;color:#0f172a;">Keep something? Pin it 📌</h3>
+  <p>The trick is that auto-clean reuses the existing <b>pin (📌)</b> feature.</p>
+  <ul>
+    <li><b>Pinned memos are never cleaned</b>, however old they are. 📌 simply means "keep this."</li>
+    <li>The memo you're <b>currently editing</b> is never removed either.</li>
+    <li>Age is measured from the <b>last time you edited</b> a memo — an old note you touched recently stays.</li>
+    <li>And it's <b>Off by default</b> — nothing is cleaned until you choose an age.</li>
+  </ul>
+
+  <!-- 2. Trash -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🗑️ Trash — delete without the fear</h2>
+  <p>
+    "Auto-delete? What if it takes something I need?" That's exactly why <b>Trash</b> ships alongside it.
+    Deleting a memo now <b>moves it to Trash instead of destroying it</b> — whether you deleted it by hand
+    or auto-clean did.
+  </p>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-6-trash.png"
+         alt="Trash — restore a deleted memo" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);border:1px solid #e2e8f0;">
+  </p>
+
+  <p>Open the 🗑️ Trash panel at the <b>bottom of the Saved tab</b> and you can:</p>
+  <ul>
+    <li><b>↩ Restore</b> — put a memo back into your saved list.</li>
+    <li><b>✕</b> — delete just that memo permanently.</li>
+    <li><b>Empty trash now</b> — clear the whole trash at once.</li>
+  </ul>
+  <p>
+    Trashed memos are kept for <b>30 days</b>, then purged for good — so accidental deletes are
+    <b>recoverable</b>, while the trash never grows without end.
+  </p>
+
+  <div style="background:#fffbeb;border-left:4px solid #f5c518;border-radius:0 10px 10px 0;padding:14px 18px;margin:22px 0;">
+    💡 <b>A nice combo:</b> turn Auto-clean on at <b>30 days</b> and <b>📌 pin</b> only the notes worth keeping.
+    Everything else tidies itself up — and if you ever miss something, <b>restore it from Trash within 30 days</b>.
+  </div>
+
+  <!-- Who it's for -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">📢 This update is for you if…</h2>
+  <ul>
+    <li>✅ Notes pile up but you keep putting off cleanup → <b>let auto-clean handle it</b></li>
+    <li>✅ You worry about deleting the wrong thing → <b>30-day undo via Trash</b></li>
+    <li>✅ Important notes get lost among scratch ones → <b>pin the keepers</b></li>
+  </ul>
+
+  <!-- Install & update -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">Install &amp; update</h2>
+  <ul>
+    <li>🛒 Chrome Web Store: <a href="https://chromewebstore.google.com/detail/simple-side-note/nfbfojjmjdhoebicleopmalefcbabonl">Install Simple Side Note</a></li>
+    <li>💻 GitHub: <a href="https://github.com/swyoonlabs/simple-side-note">github.com/swyoonlabs/simple-side-note</a></li>
+    <li>🌐 Developer Blog: <a href="https://swyoonlabs.blogspot.com/">swyoonlabs.blogspot.com</a></li>
+  </ul>
+  <p>
+    If you already have it installed, the Web Store <b>updates you automatically</b>.
+    Installed from source? Pull the latest and hit <b>Reload</b> at <code>chrome://extensions/</code> to get 1.3.0.
+  </p>
+
+  <p style="margin-top:28px;color:#64748b;font-size:15px;">
+    Simple Side Note keeps every memo <b>on your device only</b> — nothing is sent to a server.
+    Auto-clean and Trash both happen entirely <b>inside your browser</b>. Your notes stay yours. 📝
+  </p>
+
+</div>

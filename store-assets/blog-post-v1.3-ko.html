@@ -1,0 +1,111 @@
+<!-- Blogspot: "HTML 보기"에 그대로 붙여넣으세요. 이미지는 GitHub(raw)에서 불러옵니다. -->
+<div style="max-width:720px;margin:0 auto;font-family:'Segoe UI','Malgun Gothic',sans-serif;line-height:1.75;color:#1e293b;">
+
+  <p style="text-align:center;margin:0 0 8px;font-size:14px;font-weight:700;letter-spacing:1px;color:#d97706;">UPDATE · v1.3.0</p>
+
+  <h1 style="text-align:center;font-size:30px;line-height:1.3;margin:0 0 20px;color:#0f172a;">
+    쌓아만 두세요, 정리는 알아서
+  </h1>
+
+  <p style="text-align:center;margin:0 0 24px;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-1-hero.png"
+         alt="Simple Side Note 1.3.0 — 브라우저 사이드바 메모장" style="width:100%;border-radius:16px;box-shadow:0 10px 30px rgba(30,41,59,.15);">
+  </p>
+
+  <p style="font-size:18px;">
+    브라우저 사이드바에 딱 붙어 있는 가벼운 메모장 <b>Simple Side Note</b>의 <b>1.3.0</b> 업데이트가 나왔습니다.
+    이번 버전을 한 문장으로 요약하면 — <b>"지우는 수고는 덜고, 실수는 되돌릴 수 있게."</b>
+  </p>
+
+  <!-- 한눈에 보기 -->
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin:28px 0;">
+    <p style="margin:0 0 10px;font-weight:700;color:#0f172a;">📝 한눈에 보기</p>
+    <ul style="margin:0;padding-left:20px;">
+      <li>🧹 <b>오래된 메모 자동 정리</b> — 고정하지 않은 메모는 정해진 기간이 지나면 알아서 정리 (7 / 30 / 90일)</li>
+      <li>🗑️ <b>휴지통</b> — 삭제해도 <b>30일간 보관</b>, 언제든 복원 가능</li>
+      <li>📌 <b>고정 = "이건 남길 것"</b> — 고정한 메모는 자동 정리에서 절대 제외</li>
+      <li>🛡️ <b>기본은 꺼짐</b> — 직접 켜야만 동작하니 갑자기 사라지는 일 없음</li>
+    </ul>
+  </div>
+
+  <!-- 1. 자동 정리 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🧹 오래된 메모 자동 정리 — 이번 업데이트의 주인공</h2>
+  <p>
+    가벼운 메모장의 딜레마가 하나 있습니다. <b>떠오를 때마다 툭툭 적어두긴 좋은데</b>, 시간이 지나면
+    대부분은 더 이상 필요 없는 잡메모가 되죠. 그렇다고 하나하나 삭제 버튼을 누르는 건 <b>은근히 귀찮은 일</b>입니다.
+  </p>
+  <p>
+    그래서 1.3.0에서는 <b>⚙️ Settings 탭 → Saved memos → Auto-clean old memos</b> 옵션을 추가했습니다.
+    <b>7일 / 30일 / 90일</b> 중 하나를 고르면, 그 기간이 지난 <b>고정하지 않은</b> 메모를
+    <b>패널을 열 때마다 자동으로 정리</b>해 줍니다. 이제 그냥 계속 적기만 하세요.
+  </p>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-7-autoclean.png"
+         alt="설정 — 오래된 메모 자동 정리" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);border:1px solid #e2e8f0;">
+  </p>
+
+  <h3 style="font-size:19px;margin:28px 0 10px;color:#0f172a;">남기고 싶은 건 📌 고정하세요</h3>
+  <p>자동 정리의 핵심은 <b>기존 고정(📌) 기능</b>을 그대로 활용한다는 점입니다.</p>
+  <ul>
+    <li><b>고정한 메모는 아무리 오래돼도 정리되지 않습니다.</b> 📌이 곧 "이건 남길 것"이라는 표시예요.</li>
+    <li><b>지금 편집 중인 메모</b>도 오래된 것이라 해도 사라지지 않습니다.</li>
+    <li>정리 기준은 <b>마지막으로 수정한 시점</b>입니다. 오래전에 쓴 메모라도 최근에 손봤다면 그대로 유지돼요.</li>
+    <li>그리고 <b>기본값은 "끔(Off)"</b> — 직접 기간을 고르기 전까지는 아무것도 정리하지 않습니다.</li>
+  </ul>
+
+  <!-- 2. 휴지통 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">🗑️ 휴지통 — 실수로 지워도 안심</h2>
+  <p>
+    "자동으로 지운다니… 필요한 게 사라지면?" 이런 걱정을 위해 <b>휴지통</b>을 함께 넣었습니다.
+    이제 메모를 삭제해도 <b>바로 사라지지 않고 휴지통으로 이동</b>합니다. 손으로 지운 것도,
+    자동 정리로 옮겨진 것도 모두 여기에 모입니다.
+  </p>
+
+  <p style="margin:24px 0;">
+    <img src="https://raw.githubusercontent.com/swyoonlabs/simple-side-note/main/screenshots/ssn-6-trash.png"
+         alt="휴지통 — 삭제한 메모 복원하기" style="width:100%;border-radius:14px;box-shadow:0 10px 30px rgba(30,41,59,.15);border:1px solid #e2e8f0;">
+  </p>
+
+  <p><b>Saved 탭 맨 아래</b>의 🗑️ Trash 패널을 펼치면:</p>
+  <ul>
+    <li><b>↩ Restore</b> — 삭제한 메모를 원래 목록으로 되돌립니다.</li>
+    <li><b>✕</b> — 이 메모만 영구 삭제합니다.</li>
+    <li><b>Empty trash now</b> — 휴지통을 한 번에 비웁니다.</li>
+  </ul>
+  <p>
+    휴지통 속 메모는 <b>30일간 보관</b>된 뒤 자동으로 완전히 사라집니다.
+    덕분에 <b>실수한 삭제는 되돌릴 수 있으면서도</b>, 휴지통이 끝없이 커지지 않아요.
+  </p>
+
+  <div style="background:#fffbeb;border-left:4px solid #f5c518;border-radius:0 10px 10px 0;padding:14px 18px;margin:22px 0;">
+    💡 <b>이렇게 쓰면 좋아요:</b> 자동 정리를 <b>30일</b>로 켜두고, 오래 남겨둘 메모만 <b>📌 고정</b>하세요.
+    나머지 잡메모는 알아서 정리되고, 혹시 아까운 게 있었다면 <b>휴지통에서 30일 안에 복원</b>하면 됩니다.
+  </div>
+
+  <!-- 이런 분께 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">📢 이번 업데이트, 이런 분께</h2>
+  <ul>
+    <li>✅ 메모는 자꾸 쌓이는데 정리는 미루게 되는 분 → <b>자동 정리로 손 안 대고 깔끔하게</b></li>
+    <li>✅ "잘못 지우면 어쩌지" 걱정되던 분 → <b>휴지통으로 30일간 되돌리기</b></li>
+    <li>✅ 중요한 메모와 잡메모가 뒤섞이는 분 → <b>📌 고정으로 남길 것만 콕</b></li>
+  </ul>
+
+  <!-- 설치 & 업데이트 -->
+  <h2 style="font-size:24px;margin:40px 0 12px;">설치 &amp; 업데이트</h2>
+  <ul>
+    <li>🛒 Chrome 웹스토어: <a href="https://chromewebstore.google.com/detail/simple-side-note/nfbfojjmjdhoebicleopmalefcbabonl?hl=ko">Simple Side Note 설치하기</a></li>
+    <li>💻 GitHub: <a href="https://github.com/swyoonlabs/simple-side-note">github.com/swyoonlabs/simple-side-note</a></li>
+    <li>🌐 개발자 블로그: <a href="https://swyoonlabs.blogspot.com/">swyoonlabs.blogspot.com</a></li>
+  </ul>
+  <p>
+    이미 설치해 쓰고 계셨다면, 웹스토어가 <b>자동으로 최신 버전으로 업데이트</b>합니다.
+    소스로 설치했다면 최신 버전을 받아 <code>chrome://extensions/</code>에서 <b>새로고침</b>하면 1.3.0이 적용됩니다.
+  </p>
+
+  <p style="margin-top:28px;color:#64748b;font-size:15px;">
+    Simple Side Note는 모든 메모를 <b>여러분의 기기에만</b> 저장합니다. 서버로 보내는 데이터는 없어요.
+    자동 정리도, 휴지통 보관도 전부 <b>브라우저 안에서</b> 이뤄집니다. 소중한 메모는 온전히 여러분 손안에 있습니다. 📝
+  </p>
+
+</div>
